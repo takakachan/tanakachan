@@ -51,6 +51,9 @@
       font-size: 0.95rem;
       font-weight: 500;
       letter-spacing: -0.03em;
+      cursor: pointer;
+      text-decoration: none;
+      color: var(--text);
     }
     .logo span { color: var(--accent); }
     .nav { display: flex; gap: 0; }
@@ -727,7 +730,7 @@
 </head>
 <body>
   <header>
-    <div class="logo"><span>●</span> Catch Pulse</div>
+    <a href="#" class="logo" onclick="goHome(event)"><span>●</span> Catch Pulse</a>
     <nav class="nav">
       <button class="nav-btn active" data-mode="grid" onclick="setMode('grid')">Explorer</button>
       <button class="nav-btn" data-mode="tinder" onclick="setMode('tinder')">Swipe</button>
@@ -1010,6 +1013,18 @@
       state.searchQuery = '';
       document.querySelector('.search-clear')?.classList.remove('visible');
       render();
+    }
+
+    function goHome(e) {
+      e.preventDefault();
+      // Reset to ALL tab (grid view with all filters)
+      state.filter = 'all';
+      state.searchQuery = '';
+      state.sortBy = 'newest';
+      document.getElementById('search-input').value = '';
+      document.querySelector('.search-clear')?.classList.remove('visible');
+      setMode('grid');
+      window.scrollTo(0, 0);
     }
 
     function setMode(m) {
