@@ -598,7 +598,7 @@
     @media (max-width: 768px) {
       header { padding: 0 12px; height: 52px; }
       .logo { font-size: 0.95rem; }
-      .search-box { 
+      .search-box {
         position: absolute;
         top: 52px;
         left: 0;
@@ -743,17 +743,20 @@
   <main>
     <div id="grid-view">
       <div class="filter-bar">
-        <button class="filter-btn active" data-filter="all">All</button>
-        <button class="filter-btn" data-filter="youtube">YouTube</button>
-        <button class="filter-btn" data-filter="rss">RSS</button>
-        <button class="filter-btn" data-filter="book">Books</button>
-        <button class="filter-btn" data-filter="movie">Film</button>
-        <button class="filter-btn" data-filter="podcast">Podcast</button>
         <select class="sort-select" id="sort-select" onchange="handleSort(this.value)">
           <option value="newest">Newest</option>
           <option value="oldest">Oldest</option>
           <option value="title">Title A-Z</option>
         </select>
+        <div class="size-selector">
+          <button class="size-btn active" onclick="setCardSize('small')" title="Small">S</button>
+          <button class="size-btn" onclick="setCardSize('medium')" title="Medium">M</button>
+          <button class="size-btn" onclick="setCardSize('large')" title="Large">L</button>
+        </div>
+        <div class="view-toggle">
+          <button class="view-toggle-btn active" data-view="all" onclick="setViewMode('all')">All</button>
+          <button class="view-toggle-btn" data-view="liked" onclick="setViewMode('liked')">Liked</button>
+        </div>
       </div>
       <div class="stats-bar">
         <div class="stat"><span class="stat-num" id="total-count">0</span><span class="stat-label">Total</span></div>
@@ -784,6 +787,21 @@
       <div class="tinder-hint">Use <span class="kbd">←</span> <span class="kbd">→</span> or swipe</div>
     </div>
     <div class="section-view" id="likes-view">
+      <div class="filter-bar">
+        <select class="sort-select" id="likes-sort-select" onchange="handleLikesSort(this.value)">
+          <option value="newest">Newest</option>
+          <option value="oldest">Oldest</option>
+          <option value="title">Title A-Z</option>
+        </select>
+        <div class="view-toggle">
+          <button class="view-toggle-btn active" data-filter="all" onclick="setLikesFilter('all')">All</button>
+          <button class="view-toggle-btn" data-filter="youtube" onclick="setLikesFilter('youtube')">YouTube</button>
+          <button class="view-toggle-btn" data-filter="rss" onclick="setLikesFilter('rss')">RSS</button>
+          <button class="view-toggle-btn" data-filter="book" onclick="setLikesFilter('book')">Books</button>
+          <button class="view-toggle-btn" data-filter="movie" onclick="setLikesFilter('movie')">Film</button>
+          <button class="view-toggle-btn" data-filter="podcast" onclick="setLikesFilter('podcast')">Podcast</button>
+        </div>
+      </div>
       <div class="section-header">
         <div>
           <h2 class="section-title">Collected</h2>
@@ -841,19 +859,23 @@
   </div>
   <div class="toast-container" id="toasts"></div>
   <script>
-    let state = { 
-      items: [], 
-      filter: 'all', 
-      currentMode: 'grid', 
-      tinderIndex: 0, 
-      tinderHistory: [], 
+    let state = {
+      items: [],
+      filter: 'all',
+      currentMode: 'grid',
+      viewMode: 'all',
+      likesFilter: 'all',
+      likesSortBy: 'newest',
+      cardSize: 'small',
+      tinderIndex: 0,
+      tinderHistory: [],
       demoSource: 'tech',
       searchQuery: '',
       sortBy: 'newest'
     };
     let deleteTarget = null;
     let deleteType = null;
-    
+
     const demoData = {
       tech: [
         {id:1,type:'youtube',title:'Complete Guide to React 19 - Everything You Need to Know',source:'WebMaster',thumbnail:'https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=800&q=80',date:'2026-02-17',url:'https://youtube.com',liked:false,archived:false},
@@ -887,13 +909,13 @@
         {id:3,type:'podcast',title:'Episode 45: Okamoto Interview',source:'Books',thumbnail:'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=800&q=80',date:'2026-02-15',url:'https://spotify.com',liked:false,archived:false}
       ]
     };
-    
+
     function init() {
       loadDemoData();
       setupEvents();
       setupKeyboard();
     }
-    
+
     function loadDemoData() {
       state.items = demoData[state.demoSource] || demoData.tech;
       state.searchQuery = '';
@@ -902,8 +924,9 @@
       const categoryName = state.demoSource.charAt(0).toUpperCase() + state.demoSource.slice(1);
       showToast('Loaded ' + state.items.length + ' ' + categoryName + ' items');
     }
-    
+
     function setupEvents() {
+      // Filter buttons (now removed from HTML, but keeping for backward compatibility)
       document.querySelectorAll('.filter-btn').forEach(b => {
         b.addEventListener('click', () => {
           document.querySelectorAll('.filter-btn').forEach(x => x.classList.remove('active'));
@@ -915,8 +938,18 @@
           render();
         });
       });
+
+      // View toggle for main grid
+      document.querySelectorAll('.view-toggle-btn[data-view]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.view-toggle-btn[data-view]').forEach(x => x.classList.remove('active'));
+          btn.classList.add('active');
+          state.viewMode = btn.dataset.view;
+          render();
+        });
+      });
     }
-    
+
     function setupKeyboard() {
       document.addEventListener('keydown', (e) => {
         // Search: Cmd/Ctrl + F
@@ -932,7 +965,7 @@
         if (e.key === 'Escape') { closeConfirm(); closeSettings(); }
       });
     }
-    
+
     function toggleSearch() {
       const sb = document.getElementById('search-box');
       const isActive = sb.classList.toggle('active');
@@ -943,7 +976,7 @@
         clearSearch();
       }
     }
-    
+
     function clearSearch() {
       const input = document.getElementById('search-input');
       input.value = '';
@@ -951,7 +984,7 @@
       document.querySelector('.search-clear')?.classList.remove('visible');
       render();
     }
-    
+
     function setMode(m) {
       state.currentMode = m;
       document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.mode === m));
@@ -961,24 +994,57 @@
       document.getElementById('likes-view').classList.toggle('active', m === 'likes');
       document.getElementById('archive-view').classList.toggle('active', m === 'archive');
       if (m === 'tinder') initTinder();
-      if (m === 'likes') renderLikes();
+      if (m === 'likes') {
+        state.likesFilter = 'all';
+        renderLikes();
+      }
       if (m === 'archive') renderArchive();
     }
-    
+
     function handleSearch(query) {
       state.searchQuery = query.toLowerCase().trim();
       render();
     }
-    
+
     function handleSort(sortBy) {
       state.sortBy = sortBy;
       render();
     }
-    
+
+    function setCardSize(size) {
+      state.cardSize = size;
+      const root = document.documentElement;
+      if (size === 'small') root.style.setProperty('--card-size', '180px');
+      else if (size === 'medium') root.style.setProperty('--card-size', '280px');
+      else if (size === 'large') root.style.setProperty('--card-size', '400px');
+
+      document.querySelectorAll('.size-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelector(`.size-btn[onclick="setCardSize('${size}')"]`)?.classList.add('active');
+    }
+
+    function setViewMode(mode) {
+      state.viewMode = mode;
+      document.querySelectorAll('.view-toggle-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelector(`.view-toggle-btn[data-view="${mode}"]`)?.classList.add('active');
+      render();
+    }
+
+    function setLikesFilter(filter) {
+      state.likesFilter = filter;
+      document.querySelectorAll('.view-toggle-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelector(`.view-toggle-btn[data-filter="${filter}"]`)?.classList.add('active');
+      renderLikes();
+    }
+
+    function handleLikesSort(sortBy) {
+      state.likesSortBy = sortBy;
+      renderLikes();
+    }
+
     function getFilteredItems() {
       let items = state.filter === 'all' ? state.items : state.items.filter(x => x.type === state.filter);
       if (state.searchQuery) {
-        items = items.filter(x => 
+        items = items.filter(x =>
           x.title.toLowerCase().includes(state.searchQuery) ||
           x.source.toLowerCase().includes(state.searchQuery)
         );
@@ -992,11 +1058,18 @@
       }
       return items;
     }
-    
+
     function getDisplayItems() {
-      return getFilteredItems();
+      let items = getFilteredItems();
+
+      // Apply view mode: 'all' vs 'liked'
+      if (state.viewMode === 'liked') {
+        items = items.filter(x => x.liked);
+      }
+
+      return items;
     }
-    
+
     function render() {
       const items = getDisplayItems();
       if (!items.length) {
@@ -1020,12 +1093,6 @@
         <div class="card" onclick="window.open('${x.url}', '_blank')" style="animation-delay: ${i * 0.02}s">
           <div class="card-img-wrap">
             ${x.thumbnail ? `<img class="card-img" src="${x.thumbnail}" alt="">` : `<div class="card-img empty">${x.type === 'youtube' ? '▶' : x.type === 'rss' ? '📰' : x.type === 'book' ? '📚' : x.type === 'movie' ? '🎬' : '🎙'}</div>`}
-            <div class="card-overlay">
-              <div class="card-actions-overlay">
-                ${x.liked ? '' : `<button class="card-action" onclick="event.stopPropagation();toggleLike(${x.id})">♥</button>`}
-                ${x.archived ? '' : `<button class="card-action" onclick="event.stopPropagation();toggleArchive(${x.id})">○</button>`}
-              </div>
-            </div>
           </div>
           <div class="card-body">
             <div class="card-type">${x.type}</div>
@@ -1033,8 +1100,8 @@
             <div class="card-meta">
               <span class="card-source">${x.source}</span>
               <div class="card-actions-mini">
-                ${x.liked ? `<button class="card-btn-mini liked" onclick="event.stopPropagation();toggleLike(${x.id})">♥</button>` : ''}
-                ${x.archived ? `<button class="card-btn-mini" onclick="event.stopPropagation();restoreArchive(${x.id})">↩</button>` : ''}
+                ${x.liked ? `<button class="card-btn-mini liked" onclick="event.stopPropagation();toggleLike(${x.id})">♥</button>` : `<button class="card-btn-mini like-btn" onclick="event.stopPropagation();toggleLike(${x.id})">♥</button>`}
+                ${x.archived ? `<button class="card-btn-mini" onclick="event.stopPropagation();restoreArchive(${x.id})">↩</button>` : `<button class="card-btn-mini nope-btn" onclick="event.stopPropagation();toggleArchive(${x.id})">○</button>`}
               </div>
             </div>
           </div>
@@ -1042,9 +1109,24 @@
       `).join('');
       updateStats();
     }
-    
+
     function renderLikes() {
-      const items = state.items.filter(x => x.liked);
+      let items = state.items.filter(x => x.liked);
+
+      // Apply likes filter
+      if (state.likesFilter !== 'all') {
+        items = items.filter(x => x.type === state.likesFilter);
+      }
+
+      // Apply likes sort
+      if (state.likesSortBy === 'newest') {
+        items = [...items].sort((a, b) => new Date(b.date) - new Date(a.date));
+      } else if (state.likesSortBy === 'oldest') {
+        items = [...items].sort((a, b) => new Date(a.date) - new Date(b.date));
+      } else if (state.likesSortBy === 'title') {
+        items = [...items].sort((a, b) => a.title.localeCompare(b.title));
+      }
+
       if (!items.length) {
         document.getElementById('likes-cards').innerHTML = '<div class="empty"><div class="empty-icon">♡</div><div class="empty-title">No collected items yet</div><div class="empty-text">Heart content while exploring to save it here for later</div></div>';
         document.getElementById('likes-count-badge').textContent = '0';
@@ -1067,7 +1149,7 @@
       `).join('');
       document.getElementById('likes-count-badge').textContent = items.length;
     }
-    
+
     function renderArchive() {
       const items = state.items.filter(x => x.archived);
       if (!items.length) {
@@ -1092,30 +1174,30 @@
       `).join('');
       document.getElementById('archive-count-badge').textContent = items.length;
     }
-    
+
     function updateStats() {
       document.getElementById('total-count').textContent = getDisplayItems().length;
       document.getElementById('like-count').textContent = state.items.filter(x => x.liked).length;
       document.getElementById('archive-count').textContent = state.items.filter(x => x.archived).length;
     }
-    
+
     function initTinder() {
       state.tinderIndex = 0;
       state.tinderHistory = [];
       updateTinderCard();
     }
-    
+
     function updateTinderCard() {
       const items = getFilteredItems();
       const card = document.getElementById('tinder-card');
       const sl = card.querySelector('.tinder-stamp.like');
       const sn = card.querySelector('.tinder-stamp.nope');
-      
+
       card.style.transition = 'none';
       card.style.transform = '';
       sl.classList.remove('show');
       sn.classList.remove('show');
-      
+
       if (state.tinderIndex >= items.length) {
         document.getElementById('tinder-img').src = '';
         document.getElementById('tinder-img').classList.add('empty');
@@ -1134,7 +1216,7 @@
         document.getElementById('tinder-progress').textContent = '';
         return;
       }
-      
+
       const it = items[state.tinderIndex];
       const img = document.getElementById('tinder-img');
       img.src = it.thumbnail || '';
@@ -1145,7 +1227,7 @@
       document.getElementById('tinder-source').textContent = it.source + ' · ' + formatDate(it.date);
       document.getElementById('tinder-progress').textContent = (state.tinderIndex + 1) + ' / ' + items.length;
     }
-    
+
     function formatDate(dateStr) {
       const date = new Date(dateStr);
       const now = new Date();
@@ -1156,14 +1238,14 @@
       if (days < 7) return days + ' days ago';
       return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
     }
-    
+
     function handleSwipe(direction) {
       const items = getFilteredItems();
       if (state.tinderIndex >= items.length) return;
-      
+
       const item = items[state.tinderIndex];
       const card = document.getElementById('tinder-card');
-      
+
       if (direction === 'right') {
         item.liked = true;
         state.tinderHistory.push({ index: state.tinderIndex, liked: true });
@@ -1171,11 +1253,11 @@
         item.archived = true;
         state.tinderHistory.push({ index: state.tinderIndex, liked: false });
       }
-      
+
       card.style.transition = 'transform 0.3s, opacity 0.3s';
       card.style.transform = `translateX(${direction === 'right' ? 500 : -500}px) rotate(${direction === 'right' ? 30 : -30}deg)`;
       card.style.opacity = '0';
-      
+
       setTimeout(() => {
         state.tinderIndex++;
         card.style.transition = 'none';
@@ -1186,10 +1268,10 @@
         updateTinderCard();
       }, 300);
     }
-    
+
     function tinderLike() { handleSwipe('right'); }
     function tinderNope() { handleSwipe('left'); }
-    
+
     function undoLast() {
       if (state.tinderHistory.length === 0) { showToast('Nothing to undo'); return; }
       const last = state.tinderHistory.pop();
@@ -1202,17 +1284,37 @@
       updateTinderCard();
       showToast('Undone');
     }
-    
+
     function toggleLike(id) {
       const x = state.items.find(i => i.id === id);
-      if (x) { x.liked = !x.liked; render(); }
+      if (x) {
+        x.liked = !x.liked;
+        render();
+        if (x.liked) {
+          // Move to Collected tab
+          setMode('likes');
+          showToast('Added to Collected');
+        } else {
+          showToast('Removed from Collected');
+        }
+      }
     }
-    
+
     function toggleArchive(id) {
       const x = state.items.find(i => i.id === id);
-      if (x) { x.archived = !x.archived; render(); }
+      if (x) {
+        x.archived = !x.archived;
+        render();
+        if (x.archived) {
+          // Move to Archive tab
+          setMode('archive');
+          showToast('Added to Archive');
+        } else {
+          showToast('Restored from Archive');
+        }
+      }
     }
-    
+
     function removeLike(id, type) {
       deleteTarget = id;
       deleteType = type;
@@ -1220,12 +1322,12 @@
       document.getElementById('confirm-text').textContent = 'This will remove this item from your collected items';
       document.getElementById('confirm').classList.add('active');
     }
-    
+
     function restoreArchive(id) {
       const x = state.items.find(i => i.id === id);
       if (x) { x.archived = false; renderArchive(); showToast('Restored'); }
     }
-    
+
     function showToast(msg) {
       const c = document.getElementById('toasts');
       const t = document.createElement('div');
@@ -1234,16 +1336,16 @@
       c.appendChild(t);
       setTimeout(() => t.remove(), 3000);
     }
-    
+
     function refreshAll() {
       loadDemoData();
       showToast('Refreshed');
     }
-    
+
     function openSettings() { document.getElementById('settings-modal').classList.add('active'); }
     function closeSettings() { document.getElementById('settings-modal').classList.remove('active'); }
     function closeConfirm() { document.getElementById('confirm').classList.remove('active'); deleteTarget = null; deleteType = null; }
-    
+
     function confirmDelete() {
       if (deleteTarget !== null) {
         if (deleteType === 'like') {
@@ -1254,23 +1356,23 @@
         closeConfirm();
       }
     }
-    
+
     function updateDemoSource() {
       state.demoSource = document.getElementById('demo-source').value;
       loadDemoData();
     }
-    
+
     // Swipe handling
     const tc = document.getElementById('tinder-card');
     let isDragging = false, startX = 0, currentX = 0;
-    
+
     tc.addEventListener('mousedown', e => {
       if (state.tinderIndex >= getFilteredItems().length) return;
       isDragging = true;
       startX = e.clientX;
       tc.style.transition = 'none';
     });
-    
+
     document.addEventListener('mousemove', e => {
       if (!isDragging) return;
       currentX = e.clientX - startX;
@@ -1282,7 +1384,7 @@
       else if (currentX < -30) { sn.classList.add('show'); sl.classList.remove('show'); }
       else { sl.classList.remove('show'); sn.classList.remove('show'); }
     });
-    
+
     document.addEventListener('mouseup', e => {
       if (!isDragging) return;
       isDragging = false;
@@ -1296,7 +1398,7 @@
       }
       currentX = 0;
     });
-    
+
     // Touch events
     tc.addEventListener('touchstart', e => {
       if (state.tinderIndex >= getFilteredItems().length) return;
@@ -1304,7 +1406,7 @@
       startX = e.touches[0].clientX;
       tc.style.transition = 'none';
     });
-    
+
     tc.addEventListener('touchmove', e => {
       if (!isDragging) return;
       e.preventDefault();
@@ -1317,7 +1419,7 @@
       else if (currentX < -30) { sn.classList.add('show'); sl.classList.remove('show'); }
       else { sl.classList.remove('show'); sn.classList.remove('show'); }
     }, { passive: false });
-    
+
     tc.addEventListener('touchend', e => {
       if (!isDragging) return;
       isDragging = false;
@@ -1331,7 +1433,7 @@
       }
       currentX = 0;
     });
-    
+
     init();
   </script>
 </body>
