@@ -906,7 +906,7 @@
       likesFilter: 'all',
       likesSortBy: 'newest',
       nopeSortBy: 'newest',
-      cardSize: 'small',
+      cardSize: 'medium',
       tinderIndex: 0,
       tinderHistory: [],
       demoSource: 'tech',
@@ -954,6 +954,8 @@
       loadDemoData();
       setupEvents();
       setupKeyboard();
+      // Initialize card size to match state
+      setCardSize(state.cardSize);
     }
 
     function loadDemoData() {
@@ -1344,6 +1346,10 @@
         // If liked, also clear nope status
         if (x.liked) x.nope = false;
         render();
+        // Also update likes view if we're on that tab
+        if (state.currentMode === 'likes') {
+          renderLikes();
+        }
         if (x.liked) {
           showToast('Added to Collected');
         } else {
@@ -1359,6 +1365,10 @@
         // If noped, also clear liked status
         if (x.nope) x.liked = false;
         render();
+        // Also update nope view if we're on that tab
+        if (state.currentMode === 'nope') {
+          renderNope();
+        }
         if (x.nope) {
           showToast('Added to Nope');
         } else {
