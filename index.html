@@ -317,23 +317,226 @@
       gap: 4px;
     }
     .card-btn-mini {
-      width: 24px;
-      height: 24px;
+      width: 32px;
+      height: 32px;
       border: none;
       background: transparent;
       color: var(--text3);
       cursor: pointer;
-      font-size: 0.75rem;
+      font-size: 1rem;
       transition: var(--transition);
       display: flex;
       align-items: center;
       justify-content: center;
+      border-radius: 50%;
+    }
+    .card-btn-mini:hover {
+      background: var(--bg3);
+      transform: scale(1.1);
     }
     .card-btn-mini:hover { color: var(--text); }
     .card-btn-mini.liked { color: var(--accent); }
     .card-btn-mini.nope:hover { color: var(--text2); }
     .card-btn-mini.like-btn:hover { color: var(--accent); }
     .card-btn-mini.dislike-btn:hover { color: var(--text2); }
+    /* Multi-select styles */
+    .card-checkbox {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      width: 22px;
+      height: 22px;
+      border: 2px solid var(--text2);
+      background: rgba(0,0,0,0.5);
+      border-radius: 4px;
+      cursor: pointer;
+      z-index: 10;
+      opacity: 0;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .card-checkbox.checked {
+      background: var(--accent);
+      border-color: var(--accent);
+      opacity: 1;
+    }
+    .card-checkbox::after {
+      content: '✓';
+      color: white;
+      font-size: 14px;
+      display: none;
+    }
+    .card-checkbox.checked::after {
+      display: block;
+    }
+    .card:hover .card-checkbox,
+    .multi-select-mode .card-checkbox {
+      opacity: 1;
+    }
+    .card.selected .card-checkbox {
+      opacity: 1;
+      border-color: var(--accent);
+    }
+    .card.selected {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px var(--accent);
+    }
+    /* Batch action bar */
+    .batch-bar {
+      position: fixed;
+      bottom: 70px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      padding: 12px 20px;
+      border-radius: 30px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      z-index: 150;
+      opacity: 0;
+      transition: var(--transition);
+      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    }
+    .batch-bar.visible {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+    .batch-bar-count {
+      font-size: 0.85rem;
+      color: var(--text);
+      font-weight: 500;
+    }
+    .batch-bar-actions {
+      display: flex;
+      gap: 8px;
+    }
+    .batch-btn {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .batch-btn.like {
+      background: var(--accent);
+      color: white;
+    }
+    .batch-btn.like:hover {
+      background: var(--accent2);
+    }
+    .batch-btn.nope {
+      background: var(--bg4);
+      color: var(--text);
+    }
+    .batch-btn.nope:hover {
+      background: var(--text3);
+    }
+    .batch-btn.cancel {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text2);
+    }
+    .batch-btn.cancel:hover {
+      background: var(--bg3);
+    }
+    /* Multi-select mode toggle */
+    .multi-select-toggle {
+      margin-left: 12px;
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text2);
+      font-size: 0.75rem;
+      cursor: pointer;
+      border-radius: var(--card-radius);
+      transition: var(--transition);
+    }
+    .multi-select-toggle:hover {
+      border-color: var(--text2);
+      color: var(--text);
+    }
+    .multi-select-toggle.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: white;
+    }
+    /* Mobile nav adjustments for batch bar */
+    @media (max-width: 768px) {
+      .batch-bar {
+        bottom: 70px;
+        padding: 10px 16px;
+        gap: 10px;
+      }
+      .batch-bar-count {
+        font-size: 0.8rem;
+      }
+      .batch-btn {
+        padding: 6px 12px;
+        font-size: 0.75rem;
+      }
+    }
+    /* Card size S - minimal style */
+    .card-size-s .card {
+      margin-bottom: 6px;
+    }
+    .card-size-s .card-img-wrap {
+      display: none;
+    }
+    .card-size-s .card-body {
+      padding: 10px 12px;
+    }
+    .card-size-s .card-type {
+      margin-bottom: 4px;
+    }
+    .card-size-s .card-title {
+      -webkit-line-clamp: 1;
+      margin-bottom: 6px;
+    }
+    .card-size-s .card-meta {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 4px;
+    }
+    .card-size-s .card-source {
+      font-size: 0.65rem;
+    }
+    .card-size-s .card-date {
+      display: none;
+    }
+    .card-size-s .card-actions-mini {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+    }
+    .card-size-s .card {
+      position: relative;
+    }
+    /* Card size M - 2 columns */
+    .card-size-m .masonry {
+      column-count: 2;
+      column-width: auto;
+    }
+    /* Card size L - 1 column */
+    .card-size-l .masonry {
+      column-count: 1;
+      column-width: auto;
+    }
+    /* Auto size for PC */
+    @media (min-width: 769px) {
+      .card-size-auto .masonry {
+        column-count: auto;
+        column-width: var(--card-size);
+      }
+    }
     .tinder-view {
       display: none;
       flex-direction: column;
@@ -414,20 +617,20 @@
       margin-top: 24px;
     }
     .tinder-btn {
-      width: 56px;
-      height: 56px;
+      width: 72px;
+      height: 72px;
       border-radius: 50%;
       border: 1px solid var(--border);
       background: var(--bg);
       color: var(--text2);
       cursor: pointer;
-      font-size: 1.2rem;
+      font-size: 1.5rem;
       transition: var(--transition);
       display: flex;
       align-items: center;
       justify-content: center;
     }
-    .tinder-btn:hover { transform: scale(1.05); border-color: var(--text2); }
+    .tinder-btn:hover { transform: scale(1.1); border-color: var(--text2); }
     .tinder-btn.nope:hover { border-color: var(--text2); color: var(--text); }
     .tinder-btn.undo:hover { border-color: var(--text2); color: var(--text); }
     .tinder-btn.like:hover { border-color: var(--accent); color: var(--accent); }
@@ -657,7 +860,7 @@
       .tinder-img { height: 320px; }
       .tinder-content { padding: 16px; }
       .tinder-title { font-size: 1.1rem; }
-      .tinder-btn { width: 52px; height: 52px; font-size: 1.2rem; }
+      .tinder-btn { width: 64px; height: 64px; font-size: 1.4rem; }
       .tinder-controls { gap: 12px; margin-top: 20px; }
       .tinder-stamp { font-size: 1.5rem; padding: 8px 16px; top: 16px; }
       .tinder-stamp.like { right: 16px; }
@@ -777,10 +980,11 @@
           <option value="title">Title A-Z</option>
         </select>
         <div class="size-selector">
-          <button class="size-btn active" onclick="setCardSize('small')" title="Small">S</button>
-          <button class="size-btn" onclick="setCardSize('medium')" title="Medium">M</button>
-          <button class="size-btn" onclick="setCardSize('large')" title="Large">L</button>
+          <button class="size-btn active" onclick="setCardSize('small')" title="Small (minimal)">S</button>
+          <button class="size-btn" onclick="setCardSize('medium')" title="Medium (2 cols)">M</button>
+          <button class="size-btn" onclick="setCardSize('large')" title="Large (1 col)">L</button>
         </div>
+        <button class="multi-select-toggle" id="multi-select-toggle" onclick="toggleMultiSelect()">✛ Select</button>
       </div>
       <div class="stats-bar">
         <div class="stat"><span class="stat-num" id="total-count">0</span><span class="stat-label">Total</span></div>
@@ -899,6 +1103,14 @@
     </div>
   </div>
   <div class="toast-container" id="toasts"></div>
+  <div class="batch-bar" id="batch-bar">
+    <span class="batch-bar-count" id="batch-count">0 selected</span>
+    <div class="batch-bar-actions">
+      <button class="batch-btn like" onclick="batchLike()">♥ Collect</button>
+      <button class="batch-btn nope" onclick="batchNope()">✕ Nope</button>
+      <button class="batch-btn cancel" onclick="cancelSelection()">Cancel</button>
+    </div>
+  </div>
   <script>
     let state = {
       items: [],
@@ -907,7 +1119,9 @@
       likesFilter: 'all',
       likesSortBy: 'newest',
       nopeSortBy: 'newest',
-      cardSize: 'medium',
+      cardSize: 'auto',
+      multiSelectMode: false,
+      selectedItems: new Set(),
       tinderIndex: 0,
       tinderHistory: [],
       demoSource: 'tech',
@@ -1064,20 +1278,41 @@
     function setCardSize(size) {
       state.cardSize = size;
       const root = document.documentElement;
+      const gridView = document.getElementById('grid-view');
+      
+      // Remove all size classes
+      gridView.classList.remove('card-size-s', 'card-size-m', 'card-size-l', 'card-size-auto');
       
       let cardWidth;
-      if (size === 'small') cardWidth = 180;
-      else if (size === 'medium') cardWidth = 280;
-      else if (size === 'large') cardWidth = 400;
+      const isMobile = window.innerWidth <= 768;
       
-      root.style.setProperty('--card-size', cardWidth + 'px');
-      
-      // Calculate number of columns based on container width
-      const container = document.querySelector('.masonry');
-      if (container) {
-        const containerWidth = container.offsetWidth;
-        const columnCount = Math.max(1, Math.floor(containerWidth / cardWidth));
-        root.style.setProperty('--column-count', columnCount);
+      if (isMobile) {
+        // Mobile: S = minimal (like nope), M = 2 columns, L = 1 column
+        if (size === 'small') {
+          gridView.classList.add('card-size-s');
+          cardWidth = 180;
+        } else if (size === 'medium') {
+          gridView.classList.add('card-size-m');
+          cardWidth = 280;
+        } else if (size === 'large') {
+          gridView.classList.add('card-size-l');
+          cardWidth = 400;
+        }
+        root.style.setProperty('--card-size', cardWidth + 'px');
+        root.style.setProperty('--column-count', size === 'small' ? 2 : size === 'medium' ? 2 : 1);
+      } else {
+        // PC: auto size based on container
+        gridView.classList.add('card-size-auto');
+        cardWidth = size === 'small' ? 180 : size === 'medium' ? 280 : 400;
+        root.style.setProperty('--card-size', cardWidth + 'px');
+        
+        // Calculate number of columns based on container width
+        const container = document.querySelector('.masonry');
+        if (container) {
+          const containerWidth = container.offsetWidth;
+          const columnCount = Math.max(1, Math.floor(containerWidth / cardWidth));
+          root.style.setProperty('--column-count', columnCount);
+        }
       }
 
       // Update all size button groups
@@ -1085,6 +1320,106 @@
         selector.querySelectorAll('.size-btn').forEach(btn => btn.classList.remove('active'));
         selector.querySelector(`.size-btn[onclick="setCardSize('${size}')"]`)?.classList.add('active');
       });
+    }
+
+    // Multi-select functions
+    function toggleMultiSelect() {
+      state.multiSelectMode = !state.multiSelectMode;
+      state.selectedItems.clear();
+      
+      const toggle = document.getElementById('multi-select-toggle');
+      const gridView = document.getElementById('grid-view');
+      
+      if (state.multiSelectMode) {
+        toggle.classList.add('active');
+        toggle.textContent = '✛ ' + state.selectedItems.size;
+        gridView.classList.add('multi-select-mode');
+      } else {
+        toggle.classList.remove('active');
+        toggle.textContent = '✛ Select';
+        gridView.classList.remove('multi-select-mode');
+      }
+      
+      updateBatchBar();
+      render();
+    }
+
+    function toggleItemSelection(id) {
+      if (state.selectedItems.has(id)) {
+        state.selectedItems.delete(id);
+      } else {
+        state.selectedItems.add(id);
+      }
+      
+      const toggle = document.getElementById('multi-select-toggle');
+      toggle.textContent = '✛ ' + state.selectedItems.size;
+      
+      updateBatchBar();
+      
+      // Update card appearance
+      const card = document.querySelector(`.card[data-id="${id}"]`);
+      if (card) {
+        card.classList.toggle('selected', state.selectedItems.has(id));
+      }
+    }
+
+    function updateBatchBar() {
+      const bar = document.getElementById('batch-bar');
+      const count = document.getElementById('batch-count');
+      
+      if (state.selectedItems.size > 0) {
+        bar.classList.add('visible');
+        count.textContent = state.selectedItems.size + ' selected';
+      } else {
+        bar.classList.remove('visible');
+      }
+    }
+
+    function batchLike() {
+      state.selectedItems.forEach(id => {
+        const item = state.items.find(i => i.id === id);
+        if (item) {
+          item.liked = true;
+          item.nope = false;
+        }
+      });
+      
+      showToast('Added ' + state.selectedItems.size + ' items to Collected');
+      state.selectedItems.clear();
+      cancelSelection();
+      render();
+      updateStats();
+    }
+
+    function batchNope() {
+      state.selectedItems.forEach(id => {
+        const item = state.items.find(i => i.id === id);
+        if (item) {
+          item.nope = true;
+          item.liked = false;
+        }
+      });
+      
+      showToast('Added ' + state.selectedItems.size + ' items to Nope');
+      state.selectedItems.clear();
+      cancelSelection();
+      render();
+      updateStats();
+    }
+
+    function cancelSelection() {
+      state.multiSelectMode = false;
+      state.selectedItems.clear();
+      
+      const toggle = document.getElementById('multi-select-toggle');
+      const gridView = document.getElementById('grid-view');
+      
+      toggle.classList.remove('active');
+      toggle.textContent = '✛ Select';
+      gridView.classList.remove('multi-select-mode');
+      
+      updateBatchBar();
+      render();
     }
 
     function setLikesFilter(filter) {
@@ -1144,7 +1479,8 @@
         return;
       }
       document.getElementById('cards').innerHTML = items.map((x, i) => `
-        <div class="card" onclick="window.open('${x.url}', '_blank')" style="animation-delay: ${i * 0.02}s">
+        <div class="card ${state.selectedItems.has(x.id) ? 'selected' : ''}" data-id="${x.id}" onclick="window.open('${x.url}', '_blank')" style="animation-delay: ${i * 0.02}s">
+          <div class="card-checkbox ${state.selectedItems.has(x.id) ? 'checked' : ''}" onclick="event.stopPropagation();toggleItemSelection(${x.id})"></div>
           <div class="card-img-wrap">
             ${x.thumbnail ? `<img class="card-img" src="${x.thumbnail}" alt="">` : `<div class="card-img empty">${x.type === 'youtube' ? '▶' : x.type === 'rss' ? '📰' : x.type === 'book' ? '📚' : x.type === 'movie' ? '🎬' : '🎙'}</div>`}
           </div>
