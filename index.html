@@ -70,7 +70,53 @@
     }
     .nav-btn:hover { color: var(--text); }
     .nav-btn.active { color: var(--text); background: var(--bg3); }
-    .header-actions { display: flex; gap: 8px; }
+    .header-actions { display: flex; gap: 8px; align-items: center; }
+    .search-box {
+      position: relative;
+      display: none;
+    }
+    .search-box.active { display: block; }
+    .search-input {
+      width: 180px;
+      height: 36px;
+      padding: 0 32px 0 12px;
+      border-radius: var(--card-radius);
+      border: 1px solid var(--border);
+      background: var(--bg3);
+      color: var(--text);
+      font-size: 0.8rem;
+      outline: none;
+      transition: var(--transition);
+    }
+    .search-input:focus {
+      border-color: var(--text2);
+      width: 240px;
+    }
+    .search-input::placeholder { color: var(--text3); }
+    .search-icon {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text3);
+      pointer-events: none;
+      font-size: 0.9rem;
+    }
+    .search-clear {
+      position: absolute;
+      right: 6px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--text3);
+      cursor: pointer;
+      font-size: 0.9rem;
+      padding: 4px 6px;
+      display: none;
+    }
+    .search-clear.visible { display: block; }
+    .search-clear:hover { color: var(--text); }
     .action-btn {
       width: 36px;
       height: 36px;
@@ -363,6 +409,7 @@
     }
     .empty-icon { font-size: 4rem; margin-bottom: 16px; opacity: 0.3; }
     .empty-title { font-size: 1.1rem; font-weight: 500; color: var(--text2); margin-bottom: 8px; }
+    .empty-desc { font-size: 0.85rem; color: var(--text3); margin-top: 4px; }
     /* Modal */
     .modal {
       position: fixed;
@@ -640,6 +687,12 @@
       <button class="nav-btn" data-mode="archive" onclick="setMode('archive')">Archive</button>
     </nav>
     <div class="header-actions">
+      <div class="search-box" id="search-box">
+        <span class="search-icon">⌕</span>
+        <input type="text" class="search-input" placeholder="Search..." id="search-input" oninput="handleSearch(this.value)">
+        <button class="search-clear" onclick="clearSearch()">×</button>
+      </div>
+      <button class="action-btn" onclick="toggleSearch()" title="Search (⌘F)">⌕</button>
       <button class="action-btn" onclick="refreshAll()">↻</button>
       <button class="action-btn" onclick="openSettings()">⚙</button>
     </div>
@@ -746,7 +799,7 @@
   </div>
   <div class="toast-container" id="toasts"></div>
   <script>
-    let state = { items: [], filter: 'all', currentMode: 'grid', tinderIndex: 0, tinderHistory: [], demoSource: 'tech' };
+    let state = { items: [], filter: 'all', currentMode: 'grid', tinderIndex: 0, tinderHistory: [], demoSource: 'tech', searchQuery: '' };
     let deleteTarget = null;
     
     const demoData = {
@@ -786,6 +839,48 @@
     function init() {
       loadDemoData();
       setupEvents();
+      setupKeyboardShortcuts();
+    }
+    
+    function toggleSearch() {
+      const sb = document.getElementById('search-box');
+      const isActive = sb.classList.toggle('active');
+      if (isActive) {
+        document.getElementById('search-input').focus();
+      } else {
+        clearSearch();
+      }
+    }
+    
+    function handleSearch(query) {
+      state.searchQuery = query.trim().toLowerCase();
+      const clearBtn = document.querySelector('.search-clear');
+      clearBtn.classList.toggle('visible', state.searchQuery.length > 0);
+      render();
+    }
+    
+    function clearSearch() {
+      const input = document.getElementById('search-input');
+      input.value = '';
+      state.searchQuery = '';
+      document.querySelector('.search-clear').classList.remove('visible');
+      render();
+    }
+    
+    function setupKeyboardShortcuts() {
+      document.addEventListener('keydown', (e) => {
+        // Search: Cmd/Ctrl + F
+        if ((e.metaKey || e.ctrlKey) && e.key === 'f') {
+          e.preventDefault();
+          toggleSearch();
+        }
+        // Tinder: Arrow keys
+        if (state.currentMode === 'tinder') {
+          if (e.key === 'ArrowRight') tinderLike();
+          else if (e.key === 'ArrowLeft') tinderNope();
+          else if (e.key === 'Escape') undoLast();
+        }
+      });
     }
     
     function loadDemoData() {
@@ -821,8 +916,16 @@
     
     function render() {
       let items = state.filter === 'all' ? state.items : state.items.filter(x => x.type === state.filter);
+      
+      // Apply search filter
+      if (state.searchQuery) {
+        items = items.filter(x => x.title.toLowerCase().includes(state.searchQuery) || x.source.toLowerCase().includes(state.searchQuery));
+      }
+      
       if (!items.length) {
-        document.getElementById('cards').innerHTML = '<div class="empty"><div class="empty-icon">○</div><div class="empty-title">No content yet</div></div>';
+        const emptyMsg = state.searchQuery ? 'No results found for "' + state.searchQuery + '"' : 'No content yet';
+        const emptyIcon = state.searchQuery ? '⌕' : '○';
+        document.getElementById('cards').innerHTML = '<div class="empty"><div class="empty-icon">' + emptyIcon + '</div><div class="empty-title">' + emptyMsg + '</div></div>';
         return;
       }
       document.getElementById('cards').innerHTML = items.map(x => `
@@ -858,7 +961,7 @@
     function renderLikes() {
       const items = state.items.filter(x => x.liked);
       if (!items.length) {
-        document.getElementById('likes-cards').innerHTML = '<div class="empty"><div class="empty-icon">♡</div><div class="empty-title">Nothing collected</div></div>';
+        document.getElementById('likes-cards').innerHTML = '<div class="empty"><div class="empty-icon">♡</div><div class="empty-title">Nothing collected yet</div><div class="empty-desc">Swipe right or click ♥ to save content</div></div>';
         return;
       }
       document.getElementById('likes-cards').innerHTML = items.map(x => `
@@ -909,7 +1012,11 @@
     }
     
     function getFilteredItems() {
-      return state.filter === 'all' ? state.items : state.items.filter(x => x.type === state.filter);
+      let items = state.filter === 'all' ? state.items : state.items.filter(x => x.type === state.filter);
+      if (state.searchQuery) {
+        items = items.filter(x => x.title.toLowerCase().includes(state.searchQuery) || x.source.toLowerCase().includes(state.searchQuery));
+      }
+      return items;
     }
     
     function updateTinderCard() {
