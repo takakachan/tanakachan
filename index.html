@@ -64,6 +64,8 @@
     .tinder-btn.like { border-color: var(--like); color: var(--like); }
     .tinder-btn:hover { transform: scale(1.1); }
     .tinder-btn.nope:hover { background: var(--nope); color: white; }
+    .tinder-btn.undo { border-color: #f59e0b; color: #f59e0b; font-size: 1.25rem; }
+    .tinder-btn.undo:hover { background: #f59e0b; color: white; }
     .tinder-btn.like:hover { background: var(--like); color: white; }
     .tinder-progress { display: flex; gap: 4px; margin-bottom: 16px; }
     .tinder-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border); }
@@ -138,6 +140,7 @@
       </div>
       <div class="tinder-actions">
         <button class="tinder-btn nope" onclick="tinderNope()">✕</button>
+        <button class="tinder-btn undo" onclick="undoLast()" title="1つ戻る">↩️</button>
         <button class="tinder-btn like" onclick="tinderLike()">❤️</button>
       </div>
     </div>
@@ -207,9 +210,20 @@
     function render(){const c=document.getElementById('cards'); let i=state.filter==='all'?state.items:state.items.filter(x=>x.type===state.filter); if(!i.length){c.innerHTML='<div class="empty"><div class="empty-icon">📭</div><div class="empty-title">まだないよ</div></div>';return;} c.innerHTML=i.map(x=>`<div class="card" onclick="window.open('${x.url}','_blank')">${x.thumbnail?`<img class="card-thumb" src="${x.thumbnail}">`:''}<div class="card-content"><div class="card-source">${x.type==='youtube'?'📺':x.type==='rss'?'📰':x.type==='book'?'📚':'🎬'} ${x.source}</div><div class="card-title">${x.title}</div><div class="card-meta"><span>📅 ${x.date}</span><div class="card-actions"><button class="card-btn ${x.liked?'liked':''}" onclick="event.stopPropagation();toggleLike(${x.id})">❤️</button></div></div></div></div>`).join(''); document.getElementById('total-count').textContent=state.items.length; document.getElementById('like-count').textContent=state.items.filter(x=>x.liked).length;}
     function renderLikes(){const c=document.getElementById('likes-cards'); const i=state.items.filter(x=>x.liked); if(!i.length){c.innerHTML='<div class="empty"><div class="empty-icon">💔</div><div class="empty-title">Likeしたないよ</div></div>';return;} c.innerHTML=i.map(x=>`<div class="card" onclick="window.open('${x.url}','_blank')">${x.thumbnail?`<img class="card-thumb" src="${x.thumbnail}">`:''}<div class="card-content"><div class="card-source">${x.type==='youtube'?'📺':x.type==='rss'?'📰':x.type==='book'?'📚':'🎬'} ${x.source}</div><div class="card-title">${x.title}</div><div class="card-meta"><span>📅 ${x.date}</span></div></div></div>`).join('');}
     function initTinder(){state.tinderIndex=0; updateTinderCard();}
-    function updateTinderCard(){const i=state.filter==='all'?state.items:state.items.filter(x=>x.type===state.filter); const card=document.getElementById('tinder-card'); card.classList.remove('like','nope'); if(state.tinderIndex>=i.length){document.getElementById('tinder-thumb').src='';document.getElementById('tinder-source').innerHTML='🎉';document.getElementById('tinder-title').textContent='すべてチェックしたよ！';document.getElementById('tinder-date').textContent='';return;} const it=i[state.tinderIndex]; document.getElementById('tinder-thumb').src=it.thumbnail||'';document.getElementById('tinder-source').innerHTML=(it.type==='youtube'?'📺':it.type==='rss'?'📰':it.type==='book'?'📚':'🎬')+' '+it.source;document.getElementById('tinder-title').textContent=it.title;document.getElementById('tinder-date').textContent='📅 '+it.date;}
-    function tinderLike(){const card=document.getElementById('tinder-card'); card.classList.add('like'); const i=state.filter==='all'?state.items:state.items.filter(x=>x.type===state.filter); if(i[state.tinderIndex]){i[state.tinderIndex].liked=true;saveState();} setTimeout(()=>{state.tinderIndex++;updateTinderCard();},300);}
-    function tinderNope(){const card=document.getElementById('tinder-card'); card.classList.add('nope'); setTimeout(()=>{state.tinderIndex++;updateTinderCard();},300);}
+    function updateTinderCard(){
+      const i=state.filter==='all'?state.items:state.items.filter(x=>x.type===state.filter);
+      const card=document.getElementById('tinder-card');
+      // Reset card state - no rotation, no border
+      card.classList.remove('like','nope');
+      card.style.transform='';
+      card.style.border='none';
+      
+      if(state.tinderIndex>=i.length){document.getElementById('tinder-thumb').src='';document.getElementById('tinder-source').innerHTML='🎉';document.getElementById('tinder-title').textContent='すべてチェックしたよ！';document.getElementById('tinder-date').textContent='';return;}
+      const it=i[state.tinderIndex];document.getElementById('tinder-thumb').src=it.thumbnail||'';document.getElementById('tinder-source').innerHTML=(it.type==='youtube'?'📺':it.type==='rss'?'📰':it.type==='book'?'📚':'🎬')+' '+it.source;document.getElementById('tinder-title').textContent=it.title;document.getElementById('tinder-date').textContent='📅 '+it.date;
+    }
+    function tinderLike(){const card=document.getElementById('tinder-card');card.style.border='3px solid var(--like)';card.classList.add('like');const i=state.filter==='all'?state.items:state.items.filter(x=>x.type===state.filter);if(i[state.tinderIndex]){i[state.tinderIndex].liked=true;saveState();}setTimeout(()=>{state.tinderIndex++;updateTinderCard();},300);}
+    function tinderNope(){const card=document.getElementById('tinder-card');card.style.border='3px solid var(--nope)';card.classList.add('nope');setTimeout(()=>{state.tinderIndex++;updateTinderCard();},300);}
+    function undoLast(){if(state.tinderIndex>0){state.tinderIndex--;updateTinderCard();showToast('1つ戻したよ');}}
     function toggleLike(id){const x=state.items.find(i=>i.id===id); if(x){x.liked=!x.liked;saveState();render();}}
     function refreshAll(){showToast('更新したよ！','success');}
     function showToast(m,t=''){const c=document.getElementById('toasts'); const to=document.createElement('div');to.className='toast '+t;to.textContent=m;c.appendChild(to);setTimeout(()=>to.remove(),3000);}
