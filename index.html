@@ -16,8 +16,8 @@
       --text: #f5f5f5;
       --text2: #a0a0a0;
       --text3: #666666;
-      --accent: #6366f1;
-      --accent2: #818cf8;
+      --accent: #f8727c;
+      --accent2: #fb98a8;
       --border: #333333;
       --card-radius: 8px;
       --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
@@ -733,6 +733,7 @@
       <button class="nav-btn" data-mode="tinder" onclick="setMode('tinder')">Swipe</button>
       <button class="nav-btn" data-mode="likes" onclick="setMode('likes')">Collected</button>
       <button class="nav-btn" data-mode="archive" onclick="setMode('archive')">Archive</button>
+      <button class="nav-btn" data-mode="nope" onclick="setMode('nope')">Nope</button>
     </nav>
     <div class="header-actions">
       <button class="demo-btn" onclick="loadDemoData()">Load Demo Data</button>
@@ -763,6 +764,10 @@
       <span class="mobile-nav-icon">▤</span>
       <span>Archive</span>
     </button>
+    <button class="mobile-nav-btn" data-mode="nope" onclick="setMode('nope')">
+      <span class="mobile-nav-icon">✕</span>
+      <span>Nope</span>
+    </button>
   </nav>
   <main>
     <div id="grid-view">
@@ -781,6 +786,7 @@
       <div class="stats-bar">
         <div class="stat"><span class="stat-num" id="total-count">0</span><span class="stat-label">Total</span></div>
         <div class="stat"><span class="stat-num" id="like-count">0</span><span class="stat-label">Collected</span></div>
+        <div class="stat"><span class="stat-num" id="nope-count">0</span><span class="stat-label">Nope</span></div>
         <div class="stat"><span class="stat-num" id="archive-count">0</span><span class="stat-label">Archive</span></div>
       </div>
       <div class="masonry" id="cards"></div>
@@ -858,6 +864,28 @@
       </div>
       <div class="masonry" id="archive-cards"></div>
     </div>
+    <div class="section-view" id="nope-view">
+      <div class="filter-bar">
+        <select class="sort-select" id="nope-sort-select" onchange="handleNopeSort(this.value)">
+          <option value="newest">Newest</option>
+          <option value="oldest">Oldest</option>
+          <option value="title">Title A-Z</option>
+        </select>
+        <div class="size-selector">
+          <button class="size-btn active" onclick="setCardSize('small')" title="Small">S</button>
+          <button class="size-btn" onclick="setCardSize('medium')" title="Medium">M</button>
+          <button class="size-btn" onclick="setCardSize('large')" title="Large">L</button>
+        </div>
+      </div>
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">Nope</h2>
+          <p class="section-desc">Content you've passed on</p>
+        </div>
+        <span class="section-count" id="nope-count-badge">0</span>
+      </div>
+      <div class="masonry" id="nope-cards"></div>
+    </div>
   </main>
   <div class="modal" id="settings-modal">
     <div class="modal-inner">
@@ -903,6 +931,7 @@
       likesFilter: 'all',
       likesSortBy: 'newest',
       archiveSortBy: 'newest',
+      nopeSortBy: 'newest',
       cardSize: 'small',
       tinderIndex: 0,
       tinderHistory: [],
@@ -915,35 +944,35 @@
 
     const demoData = {
       tech: [
-        {id:1,type:'youtube',title:'Complete Guide to React 19 - Everything You Need to Know',source:'WebMaster',thumbnail:'https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=800&q=80',date:'2026-02-17',url:'https://youtube.com',liked:false,archived:false},
-        {id:2,type:'youtube',title:'Building AI Agents with Claude API - Full Tutorial',source:'CodeLab',thumbnail:'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&q=80',date:'2026-02-17',url:'https://youtube.com',liked:false,archived:false},
-        {id:3,type:'rss',title:'New JavaScript Framework Announced - What You Need to Know',source:'TechCrunch',thumbnail:'https://images.unsplash.com/photo-1504639725590-34d0984388bd?w=800&q=80',date:'2026-02-17',url:'https://techcrunch.jp',liked:false,archived:false},
-        {id:4,type:'podcast',title:'Episode 195: Exploring the Mysteries of the Universe',source:'Science Podcast',thumbnail:'https://images.unsplash.com/photo-1478737270239-2f02b77fc618?w=800&q=80',date:'2026-02-16',url:'https://spotify.com',liked:false,archived:false},
-        {id:5,type:'book',title:'Software Design Patterns - Essential Guide',source:'O Reilly',thumbnail:'https://images.unsplash.com/photo-1532012197267-da84d127e765?w=800&q=80',date:'2026-02-16',url:'https://oreilly.com',liked:false,archived:false},
-        {id:6,type:'movie',title:'When AI Gains Consciousness - A New Era Begins',source:'MovieDB',thumbnail:'https://images.unsplash.com/photo-1485846234645-a62644f84728?w=800&q=80',date:'2026-02-15',url:'https://moviedb.org',liked:false,archived:false},
-        {id:7,type:'youtube',title:'Vim Will Never Die - The Deep End of Customization',source:'Linux Fan',thumbnail:'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&q=80',date:'2026-02-15',url:'https://youtube.com',liked:false,archived:false},
-        {id:8,type:'rss',title:'TypeScript 6.0 Predictions - The Type System Evolution',source:'TS Weekly',thumbnail:'https://images.unsplash.com/photo-1516116216624-53e697fedbea?w=800&q=80',date:'2026-02-14',url:'https://example.com',liked:false,archived:false}
+        {id:1,type:'youtube',title:'Complete Guide to React 19 - Everything You Need to Know',source:'WebMaster',thumbnail:'https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=800&q=80',date:'2026-02-17',url:'https://youtube.com',liked:false,archived:false,nope:false},
+        {id:2,type:'youtube',title:'Building AI Agents with Claude API - Full Tutorial',source:'CodeLab',thumbnail:'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&q=80',date:'2026-02-17',url:'https://youtube.com',liked:false,archived:false,nope:false},
+        {id:3,type:'rss',title:'New JavaScript Framework Announced - What You Need to Know',source:'TechCrunch',thumbnail:'https://images.unsplash.com/photo-1504639725590-34d0984388bd?w=800&q=80',date:'2026-02-17',url:'https://techcrunch.jp',liked:false,archived:false,nope:false},
+        {id:4,type:'podcast',title:'Episode 195: Exploring the Mysteries of the Universe',source:'Science Podcast',thumbnail:'https://images.unsplash.com/photo-1478737270239-2f02b77fc618?w=800&q=80',date:'2026-02-16',url:'https://spotify.com',liked:false,archived:false,nope:false},
+        {id:5,type:'book',title:'Software Design Patterns - Essential Guide',source:'O Reilly',thumbnail:'https://images.unsplash.com/photo-1532012197267-da84d127e765?w=800&q=80',date:'2026-02-16',url:'https://oreilly.com',liked:false,archived:false,nope:false},
+        {id:6,type:'movie',title:'When AI Gains Consciousness - A New Era Begins',source:'MovieDB',thumbnail:'https://images.unsplash.com/photo-1485846234645-a62644f84728?w=800&q=80',date:'2026-02-15',url:'https://moviedb.org',liked:false,archived:false,nope:false},
+        {id:7,type:'youtube',title:'Vim Will Never Die - The Deep End of Customization',source:'Linux Fan',thumbnail:'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&q=80',date:'2026-02-15',url:'https://youtube.com',liked:false,archived:false,nope:false},
+        {id:8,type:'rss',title:'TypeScript 6.0 Predictions - The Type System Evolution',source:'TS Weekly',thumbnail:'https://images.unsplash.com/photo-1516116216624-53e697fedbea?w=800&q=80',date:'2026-02-14',url:'https://example.com',liked:false,archived:false,nope:false}
       ],
       entertainment: [
-        {id:1,type:'youtube',title:'Winter 2026 Anime Ranking TOP 10',source:'AnimeHype',thumbnail:'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=800&q=80',date:'2026-02-17',url:'https://youtube.com',liked:false,archived:false},
-        {id:2,type:'movie',title:'Long-Awaited Sequel Finally Released',source:'Cinema',thumbnail:'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=800&q=80',date:'2026-02-17',url:'https://moviedb.org',liked:false,archived:false},
-        {id:3,type:'youtube',title:'Famous Directors Discuss Film Making',source:'DirectorTalk',thumbnail:'https://images.unsplash.com/photo-1485846234645-a62644f84728?w=800&q=80',date:'2026-02-16',url:'https://youtube.com',liked:false,archived:false},
-        {id:4,type:'podcast',title:'Oscar Predictions 2026 - Film Talk',source:'FilmTalk',thumbnail:'https://images.unsplash.com/photo-1598899134739-24c46f58b8c0?w=800&q=80',date:'2026-02-16',url:'https://spotify.com',liked:false,archived:false}
+        {id:1,type:'youtube',title:'Winter 2026 Anime Ranking TOP 10',source:'AnimeHype',thumbnail:'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=800&q=80',date:'2026-02-17',url:'https://youtube.com',liked:false,archived:false,nope:false},
+        {id:2,type:'movie',title:'Long-Awaited Sequel Finally Released',source:'Cinema',thumbnail:'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=800&q=80',date:'2026-02-17',url:'https://moviedb.org',liked:false,archived:false,nope:false},
+        {id:3,type:'youtube',title:'Famous Directors Discuss Film Making',source:'DirectorTalk',thumbnail:'https://images.unsplash.com/photo-1485846234645-a62644f84728?w=800&q=80',date:'2026-02-16',url:'https://youtube.com',liked:false,archived:false,nope:false},
+        {id:4,type:'podcast',title:'Oscar Predictions 2026 - Film Talk',source:'FilmTalk',thumbnail:'https://images.unsplash.com/photo-1598899134739-24c46f58b8c0?w=800&q=80',date:'2026-02-16',url:'https://spotify.com',liked:false,archived:false,nope:false}
       ],
       news: [
-        {id:1,type:'rss',title:'Breaking: Major Economic News',source:'Nikkei',thumbnail:'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&q=80',date:'2026-02-17',url:'https://nikkei.com',liked:false,archived:false},
-        {id:2,type:'rss',title:'Government Announces New Policy',source:'NHK',thumbnail:'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&q=80',date:'2026-02-17',url:'https://nhk.jp',liked:false,archived:false},
-        {id:3,type:'rss',title:'Tech Industry Mega Merger Announced',source:'TechCrunch',thumbnail:'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80',date:'2026-02-16',url:'https://techcrunch.jp',liked:false,archived:false}
+        {id:1,type:'rss',title:'Breaking: Major Economic News',source:'Nikkei',thumbnail:'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&q=80',date:'2026-02-17',url:'https://nikkei.com',liked:false,archived:false,nope:false},
+        {id:2,type:'rss',title:'Government Announces New Policy',source:'NHK',thumbnail:'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&q=80',date:'2026-02-17',url:'https://nhk.jp',liked:false,archived:false,nope:false},
+        {id:3,type:'rss',title:'Tech Industry Mega Merger Announced',source:'TechCrunch',thumbnail:'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80',date:'2026-02-16',url:'https://techcrunch.jp',liked:false,archived:false,nope:false}
       ],
       science: [
-        {id:1,type:'youtube',title:'From the Big Bang to the Future - Complete Documentary',source:'NASA',thumbnail:'https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?w=800&q=80',date:'2026-02-17',url:'https://youtube.com',liked:false,archived:false},
-        {id:2,type:'rss',title:'Quantum Computing Breakthrough Announced',source:'ScienceDaily',thumbnail:'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=800&q=80',date:'2026-02-16',url:'https://sciencedaily.com',liked:false,archived:false},
-        {id:3,type:'youtube',title:'The Science of Focus - Brain Explained',source:'BrainScience',thumbnail:'https://images.unsplash.com/photo-1559757175-5700dde675bc?w=800&q=80',date:'2026-02-15',url:'https://youtube.com',liked:false,archived:false}
+        {id:1,type:'youtube',title:'From the Big Bang to the Future - Complete Documentary',source:'NASA',thumbnail:'https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?w=800&q=80',date:'2026-02-17',url:'https://youtube.com',liked:false,archived:false,nope:false},
+        {id:2,type:'rss',title:'Quantum Computing Breakthrough Announced',source:'ScienceDaily',thumbnail:'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=800&q=80',date:'2026-02-16',url:'https://sciencedaily.com',liked:false,archived:false,nope:false},
+        {id:3,type:'youtube',title:'The Science of Focus - Brain Explained',source:'BrainScience',thumbnail:'https://images.unsplash.com/photo-1559757175-5700dde675bc?w=800&q=80',date:'2026-02-15',url:'https://youtube.com',liked:false,archived:false,nope:false}
       ],
       podcast: [
-        {id:1,type:'podcast',title:'Episode 198: Yuru Language Radio',source:'Yuru',thumbnail:'https://images.unsplash.com/photo-1589903308904-1010c2294adc?w=800&q=80',date:'2026-02-17',url:'https://spotify.com',liked:false,archived:false},
-        {id:2,type:'podcast',title:'Tsundoku Channel Latest Episode',source:'Tsundoku',thumbnail:'https://images.unsplash.com/photo-1478737270239-2f02b77fc618?w=800&q=80',date:'2026-02-16',url:'https://spotify.com',liked:false,archived:false},
-        {id:3,type:'podcast',title:'Episode 45: Okamoto Interview',source:'Books',thumbnail:'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=800&q=80',date:'2026-02-15',url:'https://spotify.com',liked:false,archived:false}
+        {id:1,type:'podcast',title:'Episode 198: Yuru Language Radio',source:'Yuru',thumbnail:'https://images.unsplash.com/photo-1589903308904-1010c2294adc?w=800&q=80',date:'2026-02-17',url:'https://spotify.com',liked:false,archived:false,nope:false},
+        {id:2,type:'podcast',title:'Tsundoku Channel Latest Episode',source:'Tsundoku',thumbnail:'https://images.unsplash.com/photo-1478737270239-2f02b77fc618?w=800&q=80',date:'2026-02-16',url:'https://spotify.com',liked:false,archived:false,nope:false},
+        {id:3,type:'podcast',title:'Episode 45: Okamoto Interview',source:'Books',thumbnail:'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=800&q=80',date:'2026-02-15',url:'https://spotify.com',liked:false,archived:false,nope:false}
       ]
     };
 
@@ -1020,12 +1049,14 @@
       document.getElementById('tinder-view').classList.toggle('active', m === 'tinder');
       document.getElementById('likes-view').classList.toggle('active', m === 'likes');
       document.getElementById('archive-view').classList.toggle('active', m === 'archive');
+      document.getElementById('nope-view').classList.toggle('active', m === 'nope');
       if (m === 'tinder') initTinder();
       if (m === 'likes') {
         state.likesFilter = 'all';
         renderLikes();
       }
       if (m === 'archive') renderArchive();
+      if (m === 'nope') renderNope();
     }
 
     function handleSearch(query) {
@@ -1045,8 +1076,11 @@
       else if (size === 'medium') root.style.setProperty('--card-size', '280px');
       else if (size === 'large') root.style.setProperty('--card-size', '400px');
 
-      document.querySelectorAll('.size-btn').forEach(btn => btn.classList.remove('active'));
-      document.querySelector(`.size-btn[onclick="setCardSize('${size}')"]`)?.classList.add('active');
+      // Update all size button groups
+      document.querySelectorAll('.size-selector').forEach(selector => {
+        selector.querySelectorAll('.size-btn').forEach(btn => btn.classList.remove('active'));
+        selector.querySelector(`.size-btn[onclick="setCardSize('${size}')"]`)?.classList.add('active');
+      });
     }
 
     function setLikesFilter(filter) {
@@ -1120,7 +1154,7 @@
               <span class="card-source">${x.source}</span>
               <div class="card-actions-mini">
                 ${x.liked ? `<button class="card-btn-mini liked" onclick="event.stopPropagation();toggleLike(${x.id})">♥</button>` : `<button class="card-btn-mini like-btn" onclick="event.stopPropagation();toggleLike(${x.id})">♥</button>`}
-                ${x.archived ? `<button class="card-btn-mini" onclick="event.stopPropagation();restoreArchive(${x.id})">↩</button>` : `<button class="card-btn-mini nope-btn" onclick="event.stopPropagation();toggleArchive(${x.id})">○</button>`}
+                ${x.nope ? `<button class="card-btn-mini nope" onclick="event.stopPropagation();toggleNope(${x.id})">✕</button>` : `<button class="card-btn-mini nope-btn" onclick="event.stopPropagation();toggleNope(${x.id})">✕</button>`}
               </div>
             </div>
           </div>
@@ -1194,9 +1228,51 @@
       document.getElementById('archive-count-badge').textContent = items.length;
     }
 
+    function renderNope() {
+      let items = state.items.filter(x => x.nope);
+      
+      // Apply nope sort
+      if (state.nopeSortBy === 'newest') {
+        items = [...items].sort((a, b) => new Date(b.date) - new Date(a.date));
+      } else if (state.nopeSortBy === 'oldest') {
+        items = [...items].sort((a, b) => new Date(a.date) - new Date(b.date));
+      } else if (state.nopeSortBy === 'title') {
+        items = [...items].sort((a, b) => a.title.localeCompare(b.title));
+      }
+      
+      if (!items.length) {
+        document.getElementById('nope-cards').innerHTML = '<div class="empty"><div class="empty-icon">✕</div><div class="empty-title">No nope items</div><div class="empty-text">Pass on content while exploring to add it here</div></div>';
+        document.getElementById('nope-count-badge').textContent = '0';
+        return;
+      }
+      document.getElementById('nope-cards').innerHTML = items.map((x, i) => `
+        <div class="card" onclick="window.open('${x.url}', '_blank')" style="animation-delay: ${i * 0.02}s">
+          <div class="card-body" style="padding: 10px 12px;">
+            <div class="card-title" style="margin-bottom: 4px;">${x.title}</div>
+            <div class="card-meta">
+              <span class="card-source">${x.source}</span>
+              <button class="card-btn-mini" onclick="event.stopPropagation();toggleNope(${x.id})">↩</button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+      document.getElementById('nope-count-badge').textContent = items.length;
+    }
+
+    function handleNopeSort(sortBy) {
+      state.nopeSortBy = sortBy;
+      renderNope();
+    }
+
+    function restoreNope(id) {
+      const x = state.items.find(i => i.id === id);
+      if (x) { x.nope = false; renderNope(); showToast('Restored'); }
+    }
+
     function updateStats() {
       document.getElementById('total-count').textContent = getDisplayItems().length;
       document.getElementById('like-count').textContent = state.items.filter(x => x.liked).length;
+      document.getElementById('nope-count').textContent = state.items.filter(x => x.nope).length;
       document.getElementById('archive-count').textContent = state.items.filter(x => x.archived).length;
     }
 
@@ -1267,9 +1343,11 @@
 
       if (direction === 'right') {
         item.liked = true;
+        item.nope = false;
         state.tinderHistory.push({ index: state.tinderIndex, liked: true });
       } else {
-        item.archived = true;
+        item.nope = true;
+        item.liked = false;
         state.tinderHistory.push({ index: state.tinderIndex, liked: false });
       }
 
@@ -1297,8 +1375,8 @@
       state.tinderIndex = last.index;
       const items = getFilteredItems();
       if (items[last.index]) {
-        if (last.liked) { items[last.index].liked = false; items[last.index].archived = false; }
-        else { items[last.index].archived = false; }
+        if (last.liked) { items[last.index].liked = false; items[last.index].nope = false; }
+        else { items[last.index].nope = false; }
       }
       updateTinderCard();
       showToast('Undone');
@@ -1308,13 +1386,28 @@
       const x = state.items.find(i => i.id === id);
       if (x) {
         x.liked = !x.liked;
+        // If liked, also clear nope status
+        if (x.liked) x.nope = false;
         render();
         if (x.liked) {
-          // Move to Collected tab
-          setMode('likes');
           showToast('Added to Collected');
         } else {
           showToast('Removed from Collected');
+        }
+      }
+    }
+
+    function toggleNope(id) {
+      const x = state.items.find(i => i.id === id);
+      if (x) {
+        x.nope = !x.nope;
+        // If noped, also clear liked status
+        if (x.nope) x.liked = false;
+        render();
+        if (x.nope) {
+          showToast('Added to Nope');
+        } else {
+          showToast('Removed from Nope');
         }
       }
     }
@@ -1323,10 +1416,10 @@
       const x = state.items.find(i => i.id === id);
       if (x) {
         x.archived = !x.archived;
+        // If archived, also clear nope status
+        if (x.archived) x.nope = false;
         render();
         if (x.archived) {
-          // Move to Archive tab
-          setMode('archive');
           showToast('Added to Archive');
         } else {
           showToast('Restored from Archive');
