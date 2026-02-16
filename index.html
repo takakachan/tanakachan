@@ -9,17 +9,17 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #ffffff;
-      --bg2: #f5f5f5;
-      --bg3: #eeeeee;
-      --bg4: #e0e0e0;
-      --text: #111111;
-      --text2: #666666;
-      --text3: #999999;
-      --accent: #000000;
-      --accent2: #333333;
-      --border: #dddddd;
-      --card-radius: 0px;
+      --bg: #0f0f0f;
+      --bg2: #1a1a1a;
+      --bg3: #252525;
+      --bg4: #333333;
+      --text: #f5f5f5;
+      --text2: #a0a0a0;
+      --text3: #666666;
+      --accent: #6366f1;
+      --accent2: #818cf8;
+      --border: #333333;
+      --card-radius: 8px;
       --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
       --card-size: 280px;
     }
@@ -38,7 +38,7 @@
       left: 0;
       right: 0;
       height: 56px;
-      background: rgba(255, 255, 255, 0.98);
+      background: rgba(15, 15, 15, 0.98);
       backdrop-filter: blur(10px);
       display: flex;
       align-items: center;
@@ -64,9 +64,23 @@
       cursor: pointer;
       transition: var(--transition);
       border-bottom: 2px solid transparent;
+      position: relative;
     }
     .nav-btn:hover { color: var(--text); }
-    .nav-btn.active { color: var(--text); border-bottom-color: var(--accent); }
+    .nav-btn.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+    .nav-btn.active::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--accent);
+      box-shadow: 0 -2px 10px var(--accent);
+    }
     .header-actions { display: flex; gap: 12px; align-items: center; }
     .size-selector {
       display: flex;
@@ -459,7 +473,7 @@
     .modal {
       position: fixed;
       inset: 0;
-      background: rgba(255,255,255,0.95);
+      background: rgba(0,0,0,0.9);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -628,9 +642,11 @@
       .stat-num { font-size: 1.1rem; }
       .stat-label { font-size: 0.65rem; }
       .nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--bg); border-top: 1px solid var(--border); justify-content: space-around; padding: 8px; gap: 0; z-index: 100; }
-      .nav-btn { flex: 1; text-align: center; padding: 8px; font-size: 0.7rem; }
+      .nav-btn { flex: 1; text-align: center; padding: 8px; font-size: 0.7rem; position: relative; }
       .nav-btn span { display: inline; }
       .nav-btn .ic { font-size: 1rem; display: block; margin-bottom: 2px; }
+      .nav-btn.active { color: var(--accent); }
+      .nav-btn.active .ic { color: var(--accent); }
       .header-actions { gap: 4px; }
       .action-btn { width: 32px; height: 32px; font-size: 0.9rem; }
       .tinder-stack { height: 480px; max-width: 100%; }
@@ -673,17 +689,25 @@
         align-items: center;
         justify-content: center;
         gap: 2px;
-        background: none;
+        background: transparent;
         border: none;
         color: var(--text3);
         font-size: 0.6rem;
         cursor: pointer;
         transition: var(--transition);
         padding: 8px;
+        border-radius: 8px;
       }
       .mobile-nav-btn:active { transform: scale(0.95); }
-      .mobile-nav-btn.active { color: var(--text); }
-      .mobile-nav-icon { font-size: 1.2rem; }
+      .mobile-nav-btn.active {
+        color: var(--accent);
+        background: rgba(99, 102, 241, 0.1);
+      }
+      .mobile-nav-btn.active .mobile-nav-icon {
+        color: var(--accent);
+        filter: drop-shadow(0 0 4px var(--accent));
+      }
+      .mobile-nav-icon { font-size: 1.2rem; transition: var(--transition); }
       header .nav { display: none; }
     }
     @keyframes fadeIn {
@@ -753,10 +777,6 @@
           <button class="size-btn" onclick="setCardSize('medium')" title="Medium">M</button>
           <button class="size-btn" onclick="setCardSize('large')" title="Large">L</button>
         </div>
-        <div class="view-toggle">
-          <button class="view-toggle-btn active" data-view="all" onclick="setViewMode('all')">All</button>
-          <button class="view-toggle-btn" data-view="liked" onclick="setViewMode('liked')">Liked</button>
-        </div>
       </div>
       <div class="stats-bar">
         <div class="stat"><span class="stat-num" id="total-count">0</span><span class="stat-label">Total</span></div>
@@ -793,6 +813,11 @@
           <option value="oldest">Oldest</option>
           <option value="title">Title A-Z</option>
         </select>
+        <div class="size-selector">
+          <button class="size-btn active" onclick="setCardSize('small')" title="Small">S</button>
+          <button class="size-btn" onclick="setCardSize('medium')" title="Medium">M</button>
+          <button class="size-btn" onclick="setCardSize('large')" title="Large">L</button>
+        </div>
         <div class="view-toggle">
           <button class="view-toggle-btn active" data-filter="all" onclick="setLikesFilter('all')">All</button>
           <button class="view-toggle-btn" data-filter="youtube" onclick="setLikesFilter('youtube')">YouTube</button>
@@ -812,6 +837,18 @@
       <div class="masonry" id="likes-cards"></div>
     </div>
     <div class="section-view" id="archive-view">
+      <div class="filter-bar">
+        <select class="sort-select" id="archive-sort-select" onchange="handleArchiveSort(this.value)">
+          <option value="newest">Newest</option>
+          <option value="oldest">Oldest</option>
+          <option value="title">Title A-Z</option>
+        </select>
+        <div class="size-selector">
+          <button class="size-btn active" onclick="setCardSize('small')" title="Small">S</button>
+          <button class="size-btn" onclick="setCardSize('medium')" title="Medium">M</button>
+          <button class="size-btn" onclick="setCardSize('large')" title="Large">L</button>
+        </div>
+      </div>
       <div class="section-header">
         <div>
           <h2 class="section-title">Archive</h2>
@@ -863,9 +900,9 @@
       items: [],
       filter: 'all',
       currentMode: 'grid',
-      viewMode: 'all',
       likesFilter: 'all',
       likesSortBy: 'newest',
+      archiveSortBy: 'newest',
       cardSize: 'small',
       tinderIndex: 0,
       tinderHistory: [],
@@ -935,16 +972,6 @@
           state.searchQuery = '';
           document.getElementById('search-input').value = '';
           if (state.currentMode === 'tinder') initTinder();
-          render();
-        });
-      });
-
-      // View toggle for main grid
-      document.querySelectorAll('.view-toggle-btn[data-view]').forEach(btn => {
-        btn.addEventListener('click', () => {
-          document.querySelectorAll('.view-toggle-btn[data-view]').forEach(x => x.classList.remove('active'));
-          btn.classList.add('active');
-          state.viewMode = btn.dataset.view;
           render();
         });
       });
@@ -1022,13 +1049,6 @@
       document.querySelector(`.size-btn[onclick="setCardSize('${size}')"]`)?.classList.add('active');
     }
 
-    function setViewMode(mode) {
-      state.viewMode = mode;
-      document.querySelectorAll('.view-toggle-btn').forEach(btn => btn.classList.remove('active'));
-      document.querySelector(`.view-toggle-btn[data-view="${mode}"]`)?.classList.add('active');
-      render();
-    }
-
     function setLikesFilter(filter) {
       state.likesFilter = filter;
       document.querySelectorAll('.view-toggle-btn').forEach(btn => btn.classList.remove('active'));
@@ -1039,6 +1059,11 @@
     function handleLikesSort(sortBy) {
       state.likesSortBy = sortBy;
       renderLikes();
+    }
+
+    function handleArchiveSort(sortBy) {
+      state.archiveSortBy = sortBy;
+      renderArchive();
     }
 
     function getFilteredItems() {
@@ -1061,12 +1086,6 @@
 
     function getDisplayItems() {
       let items = getFilteredItems();
-
-      // Apply view mode: 'all' vs 'liked'
-      if (state.viewMode === 'liked') {
-        items = items.filter(x => x.liked);
-      }
-
       return items;
     }
 
