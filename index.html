@@ -46,8 +46,8 @@
     .tinder-container.active { display: flex; }
     .tinder-card { width: 100%; max-width: 400px; height: 500px; background: var(--bg-card); border-radius: 24px; overflow: hidden; position: relative; box-shadow: 0 20px 60px rgba(0,0,0,0.5); cursor: grab; transition: transform 0.1s; }
     .tinder-card:active { cursor: grabbing; }
-    .tinder-card.like { animation: flyRight 0.5s forwards; }
-    .tinder-card.nope { animation: flyLeft 0.5s forwards; }
+    .tinder-card.like { animation: flyRight 0.5s forwards; border: 3px solid var(--like); }
+    .tinder-card.nope { animation: flyLeft 0.5s forwards; border: 3px solid var(--nope); }
     @keyframes flyRight { to { transform: translateX(500px) rotate(30deg); opacity: 0; } }
     @keyframes flyLeft { to { transform: translateX(-500px) rotate(-30deg); opacity: 0; } }
     .tinder-thumb { width: 100%; height: 280px; object-fit: cover; background: linear-gradient(135deg, var(--bg-card), var(--border)); }
@@ -221,10 +221,17 @@
     document.querySelectorAll('.genre-tag').forEach(b=>b.addEventListener('click',()=>{b.classList.toggle('selected');const g=b.dataset.genre;if(state.genres.includes(g))state.genres=state.genres.filter(x=>x!==g);else state.genres.push(g);saveState();}));
     function saveApiKeys(){state.apiKeys.youtube=document.getElementById('api-youtube').value;state.apiKeys.moviedb=document.getElementById('api-moviedb').value;saveState();showToast('保存したよ！','success');}
     // Drag
-    let sx=0,cx=0;const tc=document.getElementById('tinder-card');
-    tc.addEventListener('mousedown',e=>{sx=e.clientX;tc.classList.add('dragging');});
-    tc.addEventListener('mousemove',e=>{if(!tc.classList.contains('dragging'))return;cx=e.clientX-sx;tc.style.transform=`translateX(${cx}px) rotate(${cx*0.05}deg)`;tc.querySelector('.tinder-overlay.like').style.opacity=Math.max(0,cx/100);tc.querySelector('.tinder-overlay.nope').style.opacity=Math.max(0,-cx/100);});
-    tc.addEventListener('mouseup',e=>{tc.classList.remove('dragging');if(cx>80)tinderLike();else if(cx<-80)tinderNope();else{tc.style.transform='';tc.querySelectorAll('.tinder-overlay').forEach(o=>o.style.opacity=0);}cx=0;});
+    let sx=0,sy=0,cx=0,dragging=false;
+    const tc=document.getElementById('tinder-card');
+    // Mouse
+    tc.addEventListener('mousedown',e=>{sx=e.clientX;dragging=true;tc.style.transition='';});
+    tc.addEventListener('mousemove',e=>{if(!dragging)return;cx=e.clientX-sx;tc.style.transform=`translateX(${cx}px) rotate(${cx*0.03}deg)`;tc.querySelector('.tinder-overlay.like').style.opacity=Math.max(0,cx/100);tc.querySelector('.tinder-overlay.nope').style.opacity=Math.max(0,-cx/100);});
+    tc.addEventListener('mouseup',e=>{if(!dragging)return;dragging=false;if(cx>50)tinderLike();else if(cx<-50)tinderNope();else{tc.style.transition='transform 0.3s';tc.style.transform='';tc.querySelectorAll('.tinder-overlay').forEach(o=>o.style.opacity=0);}cx=0;});
+    tc.addEventListener('mouseleave',e=>{if(dragging){dragging=false;if(cx>50)tinderLike();else if(cx<-50)tinderNope();else{tc.style.transition='transform 0.3s';tc.style.transform='';}cx=0;}});
+    // Touch
+    tc.addEventListener('touchstart',e=>{sx=e.touches[0].clientX;sy=e.touches[0].clientY;dragging=true;tc.style.transition='';});
+    tc.addEventListener('touchmove',e=>{if(!dragging)return;e.preventDefault();cx=e.touches[0].clientX-sx;tc.style.transform=`translateX(${cx}px) rotate(${cx*0.03}deg)`;tc.querySelector('.tinder-overlay.like').style.opacity=Math.max(0,cx/100);tc.querySelector('.tinder-overlay.nope').style.opacity=Math.max(0,-cx/100);},{passive:false});
+    tc.addEventListener('touchend',e=>{if(!dragging)return;dragging=false;const diff=e.changedTouches[0].clientX-sx;if(diff>50)tinderLike();else if(diff<-50)tinderNope();else{tc.style.transition='transform 0.3s';tc.style.transform='';tc.querySelectorAll('.tinder-overlay').forEach(o=>o.style.opacity=0);}sx=sy=cx=0;});
     loadState();
   </script>
 </body>
