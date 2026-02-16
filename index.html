@@ -90,6 +90,21 @@
       font-size: 0.8rem;
       pointer-events: none;
     }
+    .search-clear {
+      position: absolute;
+      right: 6px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--text3);
+      cursor: pointer;
+      font-size: 0.8rem;
+      padding: 4px 6px;
+      display: none;
+    }
+    .search-clear.visible { display: block; }
+    .search-clear:hover { color: var(--text); }
     .action-btn {
       width: 36px;
       height: 36px;
@@ -558,7 +573,23 @@
     @media (max-width: 768px) {
       header { padding: 0 12px; height: 52px; }
       .logo { font-size: 0.95rem; }
-      .search-box { display: none; }
+      .search-box { 
+        position: absolute;
+        top: 52px;
+        left: 0;
+        right: 0;
+        background: var(--bg);
+        padding: 12px;
+        border-bottom: 1px solid var(--border);
+        display: none;
+      }
+      .search-box.active { display: block; }
+      .search-input { width: 100%; }
+      .search-input:focus { width: 100%; }
+      .search-box.active ~ main,
+      body.search-active main {
+        padding-top: 120px;
+      }
       main { padding: 64px 12px 80px; padding-left: 8px; padding-right: 8px; }
       .masonry { columns: 2 140px; column-gap: 8px; }
       .card { margin-bottom: 8px; break-inside: avoid; }
@@ -655,10 +686,12 @@
       <button class="nav-btn" data-mode="archive" onclick="setMode('archive')">Archive</button>
     </nav>
     <div class="header-actions">
-      <div class="search-box">
+      <div class="search-box" id="search-box">
         <span class="search-icon">⌕</span>
         <input type="text" class="search-input" placeholder="Search..." id="search-input" oninput="handleSearch(this.value)">
+        <button class="search-clear" onclick="clearSearch()">×</button>
       </div>
+      <button class="action-btn" onclick="toggleSearch()" title="Search (⌘F)">⌕</button>
       <button class="action-btn" onclick="refreshAll()">↻</button>
       <button class="action-btn" onclick="openSettings()">⚙</button>
     </div>
@@ -799,33 +832,33 @@
       tech: [
         {id:1,type:'youtube',title:'Complete Guide to React 19 - Everything You Need to Know',source:'WebMaster',thumbnail:'https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=800&q=80',date:'2026-02-17',url:'https://youtube.com',liked:false,archived:false},
         {id:2,type:'youtube',title:'Building AI Agents with Claude API - Full Tutorial',source:'CodeLab',thumbnail:'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&q=80',date:'2026-02-17',url:'https://youtube.com',liked:false,archived:false},
-        {id:3,type:'rss',title:'New JavaScript Framework Announced - What You Need to Know',source:'TechCrunch',thumbnail:'',date:'2026-02-17',url:'https://techcrunch.jp',liked:false,archived:false},
-        {id:4,type:'podcast',title:'Episode 195: Exploring the Mysteries of the Universe',source:'Science Podcast',thumbnail:'',date:'2026-02-16',url:'https://spotify.com',liked:false,archived:false},
-        {id:5,type:'book',title:'Software Design Patterns - Essential Guide',source:'O Reilly',thumbnail:'',date:'2026-02-16',url:'https://oreilly.com',liked:false,archived:false},
-        {id:6,type:'movie',title:'When AI Gains Consciousness - A New Era Begins',source:'MovieDB',thumbnail:'',date:'2026-02-15',url:'https://moviedb.org',liked:false,archived:false},
+        {id:3,type:'rss',title:'New JavaScript Framework Announced - What You Need to Know',source:'TechCrunch',thumbnail:'https://images.unsplash.com/photo-1504639725590-34d0984388bd?w=800&q=80',date:'2026-02-17',url:'https://techcrunch.jp',liked:false,archived:false},
+        {id:4,type:'podcast',title:'Episode 195: Exploring the Mysteries of the Universe',source:'Science Podcast',thumbnail:'https://images.unsplash.com/photo-1478737270239-2f02b77fc618?w=800&q=80',date:'2026-02-16',url:'https://spotify.com',liked:false,archived:false},
+        {id:5,type:'book',title:'Software Design Patterns - Essential Guide',source:'O Reilly',thumbnail:'https://images.unsplash.com/photo-1532012197267-da84d127e765?w=800&q=80',date:'2026-02-16',url:'https://oreilly.com',liked:false,archived:false},
+        {id:6,type:'movie',title:'When AI Gains Consciousness - A New Era Begins',source:'MovieDB',thumbnail:'https://images.unsplash.com/photo-1485846234645-a62644f84728?w=800&q=80',date:'2026-02-15',url:'https://moviedb.org',liked:false,archived:false},
         {id:7,type:'youtube',title:'Vim Will Never Die - The Deep End of Customization',source:'Linux Fan',thumbnail:'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&q=80',date:'2026-02-15',url:'https://youtube.com',liked:false,archived:false},
-        {id:8,type:'rss',title:'TypeScript 6.0 Predictions - The Type System Evolution',source:'TS Weekly',thumbnail:'',date:'2026-02-14',url:'https://example.com',liked:false,archived:false}
+        {id:8,type:'rss',title:'TypeScript 6.0 Predictions - The Type System Evolution',source:'TS Weekly',thumbnail:'https://images.unsplash.com/photo-1516116216624-53e697fedbea?w=800&q=80',date:'2026-02-14',url:'https://example.com',liked:false,archived:false}
       ],
       entertainment: [
         {id:1,type:'youtube',title:'Winter 2026 Anime Ranking TOP 10',source:'AnimeHype',thumbnail:'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=800&q=80',date:'2026-02-17',url:'https://youtube.com',liked:false,archived:false},
-        {id:2,type:'movie',title:'Long-Awaited Sequel Finally Released',source:'Cinema',thumbnail:'',date:'2026-02-17',url:'https://moviedb.org',liked:false,archived:false},
+        {id:2,type:'movie',title:'Long-Awaited Sequel Finally Released',source:'Cinema',thumbnail:'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=800&q=80',date:'2026-02-17',url:'https://moviedb.org',liked:false,archived:false},
         {id:3,type:'youtube',title:'Famous Directors Discuss Film Making',source:'DirectorTalk',thumbnail:'https://images.unsplash.com/photo-1485846234645-a62644f84728?w=800&q=80',date:'2026-02-16',url:'https://youtube.com',liked:false,archived:false},
-        {id:4,type:'podcast',title:'Oscar Predictions 2026 - Film Talk',source:'FilmTalk',thumbnail:'',date:'2026-02-16',url:'https://spotify.com',liked:false,archived:false}
+        {id:4,type:'podcast',title:'Oscar Predictions 2026 - Film Talk',source:'FilmTalk',thumbnail:'https://images.unsplash.com/photo-1598899134739-24c46f58b8c0?w=800&q=80',date:'2026-02-16',url:'https://spotify.com',liked:false,archived:false}
       ],
       news: [
-        {id:1,type:'rss',title:'Breaking: Major Economic News',source:'Nikkei',thumbnail:'',date:'2026-02-17',url:'https://nikkei.com',liked:false,archived:false},
-        {id:2,type:'rss',title:'Government Announces New Policy',source:'NHK',thumbnail:'',date:'2026-02-17',url:'https://nhk.jp',liked:false,archived:false},
-        {id:3,type:'rss',title:'Tech Industry Mega Merger Announced',source:'TechCrunch',thumbnail:'',date:'2026-02-16',url:'https://techcrunch.jp',liked:false,archived:false}
+        {id:1,type:'rss',title:'Breaking: Major Economic News',source:'Nikkei',thumbnail:'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&q=80',date:'2026-02-17',url:'https://nikkei.com',liked:false,archived:false},
+        {id:2,type:'rss',title:'Government Announces New Policy',source:'NHK',thumbnail:'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&q=80',date:'2026-02-17',url:'https://nhk.jp',liked:false,archived:false},
+        {id:3,type:'rss',title:'Tech Industry Mega Merger Announced',source:'TechCrunch',thumbnail:'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80',date:'2026-02-16',url:'https://techcrunch.jp',liked:false,archived:false}
       ],
       science: [
         {id:1,type:'youtube',title:'From the Big Bang to the Future - Complete Documentary',source:'NASA',thumbnail:'https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?w=800&q=80',date:'2026-02-17',url:'https://youtube.com',liked:false,archived:false},
-        {id:2,type:'rss',title:'Quantum Computing Breakthrough Announced',source:'ScienceDaily',thumbnail:'',date:'2026-02-16',url:'https://sciencedaily.com',liked:false,archived:false},
+        {id:2,type:'rss',title:'Quantum Computing Breakthrough Announced',source:'ScienceDaily',thumbnail:'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=800&q=80',date:'2026-02-16',url:'https://sciencedaily.com',liked:false,archived:false},
         {id:3,type:'youtube',title:'The Science of Focus - Brain Explained',source:'BrainScience',thumbnail:'https://images.unsplash.com/photo-1559757175-5700dde675bc?w=800&q=80',date:'2026-02-15',url:'https://youtube.com',liked:false,archived:false}
       ],
       podcast: [
-        {id:1,type:'podcast',title:'Episode 198: Yuru Language Radio',source:'Yuru',thumbnail:'',date:'2026-02-17',url:'https://spotify.com',liked:false,archived:false},
-        {id:2,type:'podcast',title:'Tsundoku Channel Latest Episode',source:'Tsundoku',thumbnail:'',date:'2026-02-16',url:'https://spotify.com',liked:false,archived:false},
-        {id:3,type:'podcast',title:'Episode 45: Okamoto Interview',source:'Books',thumbnail:'',date:'2026-02-15',url:'https://spotify.com',liked:false,archived:false}
+        {id:1,type:'podcast',title:'Episode 198: Yuru Language Radio',source:'Yuru',thumbnail:'https://images.unsplash.com/photo-1589903308904-1010c2294adc?w=800&q=80',date:'2026-02-17',url:'https://spotify.com',liked:false,archived:false},
+        {id:2,type:'podcast',title:'Tsundoku Channel Latest Episode',source:'Tsundoku',thumbnail:'https://images.unsplash.com/photo-1478737270239-2f02b77fc618?w=800&q=80',date:'2026-02-16',url:'https://spotify.com',liked:false,archived:false},
+        {id:3,type:'podcast',title:'Episode 45: Okamoto Interview',source:'Books',thumbnail:'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=800&q=80',date:'2026-02-15',url:'https://spotify.com',liked:false,archived:false}
       ]
     };
     
@@ -859,13 +892,37 @@
     
     function setupKeyboard() {
       document.addEventListener('keydown', (e) => {
+        // Search: Cmd/Ctrl + F
+        if ((e.metaKey || e.ctrlKey) && e.key === 'f') {
+          e.preventDefault();
+          toggleSearch();
+        }
         if (state.currentMode === 'tinder') {
           if (e.key === 'ArrowRight') { e.preventDefault(); tinderLike(); }
           if (e.key === 'ArrowLeft') { e.preventDefault(); tinderNope(); }
-          if (e.key === 'Escape') { closeConfirm(); closeSettings(); }
+          if (e.key === 'Escape') { closeConfirm(); closeSettings(); undoLast(); }
         }
         if (e.key === 'Escape') { closeConfirm(); closeSettings(); }
       });
+    }
+    
+    function toggleSearch() {
+      const sb = document.getElementById('search-box');
+      const isActive = sb.classList.toggle('active');
+      document.body.classList.toggle('search-active', isActive);
+      if (isActive) {
+        document.getElementById('search-input').focus();
+      } else {
+        clearSearch();
+      }
+    }
+    
+    function clearSearch() {
+      const input = document.getElementById('search-input');
+      input.value = '';
+      state.searchQuery = '';
+      document.querySelector('.search-clear')?.classList.remove('visible');
+      render();
     }
     
     function setMode(m) {
