@@ -67,6 +67,22 @@
     .nav-btn:hover { color: var(--text); }
     .nav-btn.active { color: var(--text); background: var(--bg3); }
     .header-actions { display: flex; gap: 8px; align-items: center; }
+    .demo-btn {
+      padding: 8px 16px;
+      border-radius: var(--card-radius);
+      border: 1px solid var(--accent);
+      background: transparent;
+      color: var(--accent);
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .demo-btn:hover {
+      background: var(--accent);
+      color: white;
+      transform: translateY(-1px);
+    }
     .search-box { position: relative; width: 200px; }
     .search-input {
       width: 100%;
@@ -686,6 +702,7 @@
       <button class="nav-btn" data-mode="archive" onclick="setMode('archive')">Archive</button>
     </nav>
     <div class="header-actions">
+      <button class="demo-btn" onclick="loadDemoData()">Load Demo Data</button>
       <div class="search-box" id="search-box">
         <span class="search-icon">⌕</span>
         <input type="text" class="search-input" placeholder="Search..." id="search-input" oninput="handleSearch(this.value)">
@@ -873,7 +890,8 @@
       state.searchQuery = '';
       document.getElementById('search-input').value = '';
       render();
-      showToast('Data loaded');
+      const categoryName = state.demoSource.charAt(0).toUpperCase() + state.demoSource.slice(1);
+      showToast('Loaded ' + state.items.length + ' ' + categoryName + ' items');
     }
     
     function setupEvents() {
@@ -973,7 +991,19 @@
     function render() {
       const items = getDisplayItems();
       if (!items.length) {
-        document.getElementById('cards').innerHTML = '<div class="empty"><div class="empty-icon">○</div><div class="empty-title">No content found</div><div class="empty-text">Try a different filter or search term</div></div>';
+        let emptyTitle = 'No content found';
+        let emptyText = 'Try a different filter or search term';
+        let emptyIcon = '○';
+        if (state.searchQuery) {
+          emptyTitle = 'No matches for "' + state.searchQuery + '"';
+          emptyText = 'Try a different search term or clear the search';
+          emptyIcon = '🔍';
+        } else if (state.filter !== 'all') {
+          emptyTitle = 'No ' + state.filter + ' content';
+          emptyText = 'Try a different category or click "All" to see everything';
+          emptyIcon = state.filter === 'youtube' ? '▶' : state.filter === 'rss' ? '📰' : state.filter === 'book' ? '📚' : state.filter === 'movie' ? '🎬' : '🎙';
+        }
+        document.getElementById('cards').innerHTML = '<div class="empty"><div class="empty-icon">' + emptyIcon + '</div><div class="empty-title">' + emptyTitle + '</div><div class="empty-text">' + emptyText + '</div></div>';
         updateStats();
         return;
       }
@@ -1007,7 +1037,7 @@
     function renderLikes() {
       const items = state.items.filter(x => x.liked);
       if (!items.length) {
-        document.getElementById('likes-cards').innerHTML = '<div class="empty"><div class="empty-icon">♡</div><div class="empty-title">Nothing collected</div><div class="empty-text">Like some content to collect it here</div></div>';
+        document.getElementById('likes-cards').innerHTML = '<div class="empty"><div class="empty-icon">♡</div><div class="empty-title">No collected items yet</div><div class="empty-text">Heart content while exploring to save it here for later</div></div>';
         document.getElementById('likes-count-badge').textContent = '0';
         return;
       }
@@ -1032,7 +1062,7 @@
     function renderArchive() {
       const items = state.items.filter(x => x.archived);
       if (!items.length) {
-        document.getElementById('archive-cards').innerHTML = '<div class="empty"><div class="empty-icon">○</div><div class="empty-title">Archive is empty</div><div class="empty-text">Items you've passed will appear here</div></div>';
+        document.getElementById('archive-cards').innerHTML = '<div class="empty"><div class="empty-icon">▤</div><div class="empty-title">Archive is empty</div><div class="empty-text">Pass on content in Swipe mode to build your archive</div></div>';
         document.getElementById('archive-count-badge').textContent = '0';
         return;
       }
@@ -1081,8 +1111,17 @@
         document.getElementById('tinder-img').src = '';
         document.getElementById('tinder-img').classList.add('empty');
         document.getElementById('tinder-type').textContent = '';
-        document.getElementById('tinder-title').textContent = 'All caught up!';
-        document.getElementById('tinder-source').textContent = '';
+        let tinderEmptyTitle = 'All caught up!';
+        let tinderEmptyHint = 'Load more demo data or switch categories to continue';
+        if (state.filter !== 'all') {
+          tinderEmptyTitle = 'No more ' + state.filter + ' content';
+          tinderEmptyHint = 'Try a different category or click "All" in the filter bar';
+        } else if (state.searchQuery) {
+          tinderEmptyTitle = 'No more results';
+          tinderEmptyHint = 'Clear your search to see all content';
+        }
+        document.getElementById('tinder-title').textContent = tinderEmptyTitle;
+        document.getElementById('tinder-source').textContent = tinderEmptyHint;
         document.getElementById('tinder-progress').textContent = '';
         return;
       }
