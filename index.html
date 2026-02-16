@@ -246,7 +246,8 @@
     .stat-num { font-size: 1.2rem; font-weight: 500; transition: var(--transition); }
     .stat-label { font-size: 0.7rem; color: var(--text3); text-transform: uppercase; letter-spacing: 0.08em; }
     .masonry {
-      columns: var(--card-size);
+      column-count: var(--column-count, 3);
+      column-width: var(--card-size);
       column-gap: 0;
     }
     .card {
@@ -956,6 +957,11 @@
       setupKeyboard();
       // Initialize card size to match state
       setCardSize(state.cardSize);
+      
+      // Update column count on window resize
+      window.addEventListener('resize', () => {
+        setCardSize(state.cardSize);
+      });
     }
 
     function loadDemoData() {
@@ -1058,9 +1064,21 @@
     function setCardSize(size) {
       state.cardSize = size;
       const root = document.documentElement;
-      if (size === 'small') root.style.setProperty('--card-size', '180px');
-      else if (size === 'medium') root.style.setProperty('--card-size', '280px');
-      else if (size === 'large') root.style.setProperty('--card-size', '400px');
+      
+      let cardWidth;
+      if (size === 'small') cardWidth = 180;
+      else if (size === 'medium') cardWidth = 280;
+      else if (size === 'large') cardWidth = 400;
+      
+      root.style.setProperty('--card-size', cardWidth + 'px');
+      
+      // Calculate number of columns based on container width
+      const container = document.querySelector('.masonry');
+      if (container) {
+        const containerWidth = container.offsetWidth;
+        const columnCount = Math.max(1, Math.floor(containerWidth / cardWidth));
+        root.style.setProperty('--column-count', columnCount);
+      }
 
       // Update all size button groups
       document.querySelectorAll('.size-selector').forEach(selector => {
