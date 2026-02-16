@@ -589,6 +589,45 @@
       .stat-card { min-width: 70px; padding: 12px; }
       .stat-num { font-size: 1rem; }
     }
+    
+    /* Mobile Bottom Navigation */
+    .mobile-nav { display: none; }
+    
+    @media (max-width: 768px) {
+      .mobile-nav {
+        display: flex;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 56px;
+        background: rgba(10, 10, 10, 0.95);
+        backdrop-filter: blur(20px);
+        border-top: 1px solid var(--border);
+        justify-content: space-around;
+        align-items: center;
+        z-index: 1000;
+      }
+      .mobile-nav-btn {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 2px;
+        background: none;
+        border: none;
+        color: var(--text3);
+        font-size: 0.6rem;
+        cursor: pointer;
+        transition: var(--transition);
+        padding: 8px;
+      }
+      .mobile-nav-btn:active { transform: scale(0.95); }
+      .mobile-nav-btn.active { color: var(--text); }
+      .mobile-nav-icon { font-size: 1.2rem; }
+      header .nav { display: none; }
+    }
   </style>
 </head>
 <body>
@@ -605,6 +644,25 @@
       <button class="action-btn" onclick="openSettings()">⚙</button>
     </div>
   </header>
+  <!-- Mobile Bottom Navigation -->
+  <nav class="mobile-nav">
+    <button class="mobile-nav-btn active" data-mode="grid" onclick="setMode('grid')">
+      <span class="mobile-nav-icon">▦</span>
+      <span>Explorer</span>
+    </button>
+    <button class="mobile-nav-btn" data-mode="tinder" onclick="setMode('tinder')">
+      <span class="mobile-nav-icon">⟲</span>
+      <span>Swipe</span>
+    </button>
+    <button class="mobile-nav-btn" data-mode="likes" onclick="setMode('likes')">
+      <span class="mobile-nav-icon">♥</span>
+      <span>Saved</span>
+    </button>
+    <button class="mobile-nav-btn" data-mode="archive" onclick="setMode('archive')">
+      <span class="mobile-nav-icon">▤</span>
+      <span>Archive</span>
+    </button>
+  </nav>
   <main>
     <div id="grid-view">
       <div class="filter-bar">
@@ -751,6 +809,7 @@
     function setMode(m) {
       state.currentMode = m;
       document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.mode === m));
+      document.querySelectorAll('.mobile-nav-btn').forEach(b => b.classList.toggle('active', b.dataset.mode === m));
       document.getElementById('grid-view').style.display = m === 'grid' ? 'block' : 'none';
       document.getElementById('tinder-view').classList.toggle('active', m === 'tinder');
       document.getElementById('likes-view').classList.toggle('active', m === 'likes');
