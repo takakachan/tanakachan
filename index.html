@@ -6,490 +6,968 @@
   <title>Media Pulse</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
-    :root { --bg: #0d0d0f; --bg2: #141418; --bg3: #1a1a1f; --card: #1e1e24; --accent: #e85d04; --accent2: #f48c06; --grad: linear-gradient(135deg,#e85d04,#f48c06,#faa307); --glow: rgba(232,93,4,0.3); --text: #fafafa; --text2: #a1a1aa; --text3: #71717a; --border: #27272a; --border2: #3f3f46; --like: #ef4444; --likeg: rgba(239,68,68,0.25); --nope: #8b5cf6; --nopeg: rgba(139,92,246,0.25); --arch: #f59e0b; --archg: rgba(245,158,11,0.2); --ok: #22c55e; --rs: 12px; --rl: 20px; --rx: 28px; --sh: 0 4px 16px rgba(0,0,0,0.4); --sh2: 0 8px 32px rgba(0,0,0,0.5); --sh3: 0 16px 48px rgba(0,0,0,0.6); }
+    :root {
+      --bg: #0a0a0a;
+      --bg2: #111111;
+      --bg3: #1a1a1a;
+      --bg4: #222222;
+      --text: #ffffff;
+      --text2: #888888;
+      --text3: #555555;
+      --accent: #ff3333;
+      --accent2: #ff5555;
+      --border: #333333;
+      --card-radius: 2px;
+      --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Zen Kaku Gothic New',-apple-system,sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; -webkit-font-smoothing: antialiased; }
-    body::before { content: ''; position: fixed; inset: 0; background: radial-gradient(ellipse 100% 60% at 20% 0%,rgba(232,93,4,0.08),transparent 50%),radial-gradient(ellipse 80% 50% at 80% 100%,rgba(244,140,6,0.06),transparent 50%); pointer-events: none; z-index: -1; }
-    header { position: sticky; top: 0; height: 72px; background: rgba(13,13,15,0.85); backdrop-filter: blur(24px); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 32px; z-index: 100; }
-    .logo { display: flex; align-items: center; gap: 14px; font-size: 1.4rem; font-weight: 700; }
-    .logn { width: 40px; height: 40px; background: var(--grad); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; box-shadow: 0 4px 20px var(--glow); animation: lp 4s ease-in-out infinite; }
-    @keyframes lp { 0%,100% { box-shadow: 0 4px 20px var(--glow); } 50% { box-shadow: 0 4px 30px rgba(244,140,6,0.5); } }
-    .logt span { background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .nav { display: flex; gap: 6px; background: var(--bg2); padding: 6px; border-radius: var(--rl); border: 1px solid var(--border); }
-    .nb { padding: 10px 18px; border-radius: var(--rs); border: none; background: 0; color: var(--text2); font-size: 0.95rem; font-weight: 500; cursor: pointer; transition: 0.15s; display: flex; align-items: center; gap: 8px; }
-    .nb:hover { color: var(--text); background: var(--bg3); }
-    .nb.on { background: var(--grad); color: #fff; box-shadow: 0 2px 12px var(--glow); }
-    .nb .ic { font-size: 1.1rem; }
-    .acts { display: flex; gap: 10px; }
-    .ab { width: 42px; height: 42px; border-radius: var(--rs); border: 1px solid var(--border); background: var(--bg2); color: var(--text2); font-size: 1.1rem; cursor: pointer; transition: 0.15s; display: flex; align-items: center; justify-content: center; }
-    .ab:hover { background: var(--bg3); color: var(--text); transform: translateY(-1px); }
-    main { max-width: 1400px; margin: 0 auto; padding: 32px; }
-    .filt { display: flex; gap: 10px; margin-bottom: 28px; flex-wrap: wrap; animation: fiu 0.5s ease backwards; }
-    @keyframes fiu { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
-    .fc { padding: 10px 20px; border-radius: 100px; background: var(--bg2); border: 1px solid var(--border); color: var(--text2); font-size: 0.9rem; font-weight: 500; cursor: pointer; transition: 0.15s; }
-    .fc:hover { border-color: var(--accent); color: var(--text); transform: translateY(-1px); }
-    .fc.on { background: var(--grad); border-color: transparent; color: #fff; box-shadow: 0 4px 16px var(--glow); }
-    .stats { display: flex; gap: 16px; margin-bottom: 32px; flex-wrap: wrap; }
-    .sc { flex: 1; min-width: 160px; padding: 20px 24px; background: var(--bg2); border-radius: var(--rl); border: 1px solid var(--border); display: flex; align-items: center; gap: 16px; animation: fiu 0.5s ease backwards; }
-    .sc:nth-child(1) { animation-delay: 0.1s; }
-    .sc:nth-child(2) { animation-delay: 0.15s; }
-    .sc:nth-child(3) { animation-delay: 0.2s; }
-    .si { width: 48px; height: 48px; border-radius: var(--rs); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; }
-    .si.t { background: rgba(139,92,246,0.15); }
-    .si.l { background: var(--likeg); }
-    .si.a { background: var(--archg); }
-    .sv { display: flex; flex-direction: column; }
-    .svv { font-size: 1.8rem; font-weight: 700; }
-    .svl { font-size: 0.8rem; color: var(--text3); text-transform: uppercase; letter-spacing: 0.05em; }
-    .cg { display: grid; grid-template-columns: repeat(auto-fill,minmax(320px,1fr)); gap: 24px; }
-    .card { background: var(--card); border-radius: var(--rx); overflow: hidden; border: 1px solid var(--border); cursor: pointer; transition: 0.25s; animation: fiu 0.5s ease backwards; }
-    .card:hover { transform: translateY(-8px); border-color: var(--accent); box-shadow: var(--sh3),0 0 40px var(--glow); }
-    .cth { width: 100%; height: 180px; object-fit: cover; background: linear-gradient(135deg,var(--bg3),var(--bg2)); }
-    .cb { padding: 20px; }
-    .cm { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
-    .ct { padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; }
-    .ct.yt { background: rgba(255,0,0,0.15); color: #f44; }
-    .ct.rs { background: rgba(255,140,0,0.15); color: #f80; }
-    .ct.bk { background: rgba(139,92,246,0.15); color: #a7b; }
-    .ct.mv { background: rgba(59,130,246,0.15); color: #6af; }
-    .ct.pc { background: var(--likeg); color: var(--like); }
-    .cs { color: var(--text3); font-size: 0.8rem; }
-    .ctt { font-size: 1.05rem; font-weight: 600; line-height: 1.5; margin-bottom: 12px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-    .cf { display: flex; justify-content: space-between; align-items: center; }
-    .cd { color: var(--text3); font-size: 0.8rem; }
-    .ca { display: flex; gap: 8px; }
-    .cab { width: 36px; height: 36px; border-radius: 10px; border: none; background: var(--bg3); color: var(--text3); font-size: 1rem; cursor: pointer; transition: 0.15s; display: flex; align-items: center; justify-content: center; }
-    .cab:hover { transform: scale(1.1); }
-    .cab.lk { background: var(--likeg); color: var(--like); }
-    .cab.ar { background: var(--archg); color: var(--arch); }
-    .tc { display: none; flex-direction: column; align-items: center; justify-content: center; min-height: calc(100vh - 200px); padding: 40px 20px; }
-    .tc.on { display: flex; }
-    .ts { position: relative; width: 100%; max-width: 380px; height: 560px; perspective: 1200px; }
-    .tcard { position: absolute; width: 100%; height: 100%; background: var(--card); border-radius: var(--rx); overflow: hidden; box-shadow: var(--sh3); transition: transform 0.1s,box-shadow 0.3s; will-change: transform; }
-    .tcard.dg { box-shadow: 0 40px 80px rgba(0,0,0,0.6); cursor: grabbing; }
-    .tcard.sl { border: 3px solid var(--nope); }
-    .tcard.sr { border: 3px solid var(--like); }
-    .ti { width: 100%; height: 320px; object-fit: cover; background: linear-gradient(135deg,var(--bg3),var(--bg2)); }
-    .tcon { padding: 24px; height: calc(100% - 320px); display: flex; flex-direction: column; }
-    .tty { display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; border-radius: 8px; font-size: 0.8rem; font-weight: 600; margin-bottom: 12px; width: fit-content; }
-    .tt { font-size: 1.4rem; font-weight: 700; line-height: 1.4; flex: 1; }
-    .td { color: var(--text3); font-size: 0.9rem; margin-top: 12px; }
-    .tss { position: absolute; top: 32px; padding: 12px 28px; border-radius: 12px; font-size: 2rem; font-weight: 800; text-transform: uppercase; letter-spacing: 3px; opacity: 0; transform: rotate(-12deg) scale(0.8); transition: 0.2s; z-index: 10; }
-    .tss.sh { opacity: 1; transform: rotate(-12deg) scale(1); }
-    .tss.lk { right: 32px; background: var(--like); color: #fff; }
-    .tss.np { left: 32px; background: var(--nope); color: #fff; transform: rotate(12deg); }
-    .tss.np.sh { transform: rotate(12deg) scale(1); }
-    .tctl { display: flex; gap: 20px; margin-top: 32px; }
-    .tb { width: 68px; height: 68px; border-radius: 50%; border: 2px solid; background: var(--card); cursor: pointer; font-size: 1.5rem; transition: 0.25s; display: flex; align-items: center; justify-content: center; }
-    .tb:active { transform: scale(0.95); }
-    .tb.np { border-color: var(--nope); color: var(--nope); }
-    .tb.np:hover { background: var(--nope); color: #fff; box-shadow: 0 8px 32px var(--nopeg); transform: scale(1.1); }
-    .tb.ud { border-color: var(--arch); color: var(--arch); }
-    .tb.ud:hover { background: var(--arch); color: #fff; box-shadow: 0 8px 32px var(--archg); transform: scale(1.1); }
-    .tb.lk { border-color: var(--like); color: var(--like); }
-    .tb.lk:hover { background: var(--like); color: #fff; box-shadow: 0 8px 32px var(--likeg); transform: scale(1.1); }
-    .tpr { margin-top: 20px; font-size: 0.95rem; color: var(--text3); padding: 10px 20px; background: var(--bg2); border-radius: 100px; }
-    .thi { display: flex; justify-content: space-between; width: 100%; max-width: 380px; margin-top: 16px; color: var(--text3); font-size: 0.85rem; }
-    .es { text-align: center; padding: 80px 24px; color: var(--text3); grid-column: 1/-1; }
-    .eic { font-size: 5rem; margin-bottom: 20px; opacity: 0.4; }
-    .eti { font-size: 1.4rem; font-weight: 600; color: var(--text2); margin-bottom: 8px; }
-    .mo { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 200; opacity: 0; visibility: hidden; transition: 0.3s; }
-    .mo.on { opacity: 1; visibility: visible; }
-    .m { background: var(--bg2); border-radius: var(--rx); width: 90%; max-width: 520px; max-height: 80vh; overflow-y: auto; transform: scale(0.9) translateY(20px); transition: 0.3s; border: 1px solid var(--border); }
-    .mo.on .m { transform: scale(1) translateY(0); }
-    .mh { padding: 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; background: var(--bg2); z-index: 10; }
-    .mt { font-size: 1.3rem; font-weight: 700; }
-    .mc { width: 40px; height: 40px; border-radius: var(--rs); border: none; background: var(--bg3); color: var(--text2); font-size: 1.3rem; cursor: pointer; transition: 0.15s; }
-    .mc:hover { background: var(--card); color: var(--text); }
-    .mb { padding: 24px; }
-    .fg { margin-bottom: 20px; }
-    .fl { display: block; font-size: 0.9rem; font-weight: 500; margin-bottom: 8px; color: var(--text2); }
-    .fs { width: 100%; padding: 14px 18px; border-radius: var(--rs); border: 1px solid var(--border); background: var(--bg3); color: var(--text); font-size: 1rem; cursor: pointer; transition: 0.15s; }
-    .fs:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--glow); }
-    .bp { width: 100%; padding: 14px 24px; border-radius: var(--rs); border: none; background: var(--grad); color: #fff; font-size: 1rem; font-weight: 600; cursor: pointer; transition: 0.15s; box-shadow: 0 4px 16px var(--glow); }
-    .bp:hover { transform: translateY(-2px); box-shadow: 0 6px 24px var(--glow); }
-    .db { display: inline-flex; align-items: center; gap: 8px; padding: 12px 18px; background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.3); border-radius: var(--rs); color: var(--ok); font-size: 0.9rem; margin-bottom: 20px; }
-    .co { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 250; opacity: 0; visibility: hidden; transition: 0.2s; }
-    .co.on { opacity: 1; visibility: visible; }
-    .cbx { background: var(--bg2); border-radius: var(--rx); padding: 28px; max-width: 340px; text-align: center; transform: scale(0.9); transition: 0.2s; border: 1px solid var(--border); }
-    .co.on .cbx { transform: scale(1); }
-    .ci { font-size: 3rem; margin-bottom: 16px; }
-    .cti { font-size: 1.2rem; font-weight: 700; margin-bottom: 10px; }
-    .ctx { color: var(--text3); margin-bottom: 24px; font-size: 0.95rem; }
-    .ca2 { display: flex; gap: 12px; justify-content: center; }
-    .cb2 { padding: 12px 28px; border-radius: var(--rs); border: none; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: 0.15s; }
-    .cb2.cl { background: var(--bg3); color: var(--text2); }
-    .cb2.dg { background: var(--like); color: #fff; }
-    .tc2 { position: fixed; bottom: 28px; right: 28px; z-index: 300; display: flex; flex-direction: column; gap: 12px; }
-    .to { padding: 14px 22px; background: var(--card); border: 1px solid var(--border); border-radius: var(--rs); font-size: 0.95rem; animation: ti 0.3s ease; box-shadow: var(--sh); }
-    .to.ok { border-color: var(--ok); background: rgba(34,197,94,0.1); }
-    @keyframes ti { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-    .st { font-size: 1.5rem; font-weight: 700; margin-bottom: 8px; letter-spacing: -0.02em; }
-    .sd { color: var(--text3); margin-bottom: 24px; font-size: 0.95rem; }
-    @media (max-width: 768px) { header { padding: 0 16px; height: 64px; } .logo { font-size: 1.2rem; } .logn { width: 36px; height: 36px; font-size: 1.1rem; } .nav { position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%); top: auto; padding: 8px; gap: 4px; z-index: 100; box-shadow: var(--sh3); } .nb { padding: 10px 14px; font-size: 0; } .nb .ic { font-size: 1.2rem; } .nb span:not(.ic) { display: none; } main { padding: 20px 16px; padding-bottom: 100px; } .cg { grid-template-columns: 1fr; gap: 16px; } .ts { height: 500px; } .stats { flex-direction: column; } .sc { min-width: auto; } }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', 'Noto Sans JP', -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+    /* Minimal header */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      background: rgba(10, 10, 10, 0.9);
+      backdrop-filter: blur(20px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 32px;
+      z-index: 100;
+      border-bottom: 1px solid var(--border);
+    }
+    .logo {
+      font-size: 1.1rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+    .logo span { color: var(--accent); }
+    .nav {
+      display: flex;
+      gap: 4px;
+    }
+    .nav-btn {
+      padding: 8px 16px;
+      border-radius: var(--card-radius);
+      border: none;
+      background: transparent;
+      color: var(--text2);
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .nav-btn:hover { color: var(--text); }
+    .nav-btn.active { color: var(--text); background: var(--bg3); }
+    .header-actions { display: flex; gap: 8px; }
+    .action-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--card-radius);
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text2);
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+    }
+    .action-btn:hover { border-color: var(--text2); color: var(--text); }
+    main {
+      padding-top: 80px;
+      padding-left: 32px;
+      padding-right: 32px;
+      padding-bottom: 60px;
+      max-width: 1800px;
+      margin: 0 auto;
+    }
+    /* Filter bar */
+    .filter-bar {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 32px;
+      flex-wrap: wrap;
+    }
+    .filter-btn {
+      padding: 8px 16px;
+      border-radius: var(--card-radius);
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text2);
+      font-size: 0.8rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .filter-btn:hover { border-color: var(--text2); color: var(--text); }
+    .filter-btn.active { background: var(--text); color: var(--bg); border-color: var(--text); }
+    /* Stats bar */
+    .stats-bar {
+      display: flex;
+      gap: 32px;
+      margin-bottom: 40px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--border);
+    }
+    .stat { display: flex; align-items: baseline; gap: 8px; }
+    .stat-num { font-size: 1.5rem; font-weight: 600; }
+    .stat-label { font-size: 0.8rem; color: var(--text3); text-transform: uppercase; letter-spacing: 0.05em; }
+    /* Masonry Grid */
+    .masonry {
+      columns: 5 280px;
+      column-gap: 16px;
+    }
+    .card {
+      break-inside: avoid;
+      margin-bottom: 16px;
+      background: var(--bg2);
+      border-radius: var(--card-radius);
+      overflow: hidden;
+      cursor: pointer;
+      transition: var(--transition);
+      position: relative;
+    }
+    .card:hover { transform: translateY(-4px); }
+    .card:hover .card-img { transform: scale(1.02); }
+    .card:hover .card-overlay { opacity: 1; }
+    .card-img-wrap {
+      position: relative;
+      overflow: hidden;
+      background: var(--bg3);
+    }
+    .card-img {
+      width: 100%;
+      display: block;
+      transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .card-img.empty {
+      min-height: 200px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+      color: var(--text3);
+    }
+    .card-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 50%);
+      opacity: 0;
+      transition: var(--transition);
+      display: flex;
+      align-items: flex-end;
+      padding: 16px;
+    }
+    .card-actions-overlay {
+      display: flex;
+      gap: 8px;
+    }
+    .card-action {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--card-radius);
+      border: none;
+      background: rgba(255,255,255,0.2);
+      backdrop-filter: blur(10px);
+      color: white;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .card-action:hover { background: var(--accent); }
+    .card-body {
+      padding: 16px;
+    }
+    .card-type {
+      font-size: 0.65rem;
+      color: var(--text3);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 8px;
+    }
+    .card-title {
+      font-size: 0.9rem;
+      font-weight: 500;
+      line-height: 1.4;
+      color: var(--text);
+      margin-bottom: 8px;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .card-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .card-source {
+      font-size: 0.75rem;
+      color: var(--text3);
+    }
+    .card-actions-mini {
+      display: flex;
+      gap: 4px;
+    }
+    .card-btn-mini {
+      width: 24px;
+      height: 24px;
+      border-radius: var(--card-radius);
+      border: none;
+      background: transparent;
+      color: var(--text3);
+      cursor: pointer;
+      font-size: 0.8rem;
+      transition: var(--transition);
+    }
+    .card-btn-mini:hover { color: var(--text); }
+    .card-btn-mini.liked { color: var(--accent); }
+    /* Tinder View */
+    .tinder-view {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
+    }
+    .tinder-view.active { display: flex; }
+    .tinder-stack {
+      position: relative;
+      width: 100%;
+      max-width: 400px;
+      height: 560px;
+    }
+    .tinder-card {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: var(--bg2);
+      border-radius: var(--card-radius);
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+      transition: transform 0.1s;
+    }
+    .tinder-card.dragging { cursor: grabbing; }
+    .tinder-img {
+      width: 100%;
+      height: 380px;
+      object-fit: cover;
+      background: var(--bg3);
+    }
+    .tinder-img.empty {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 4rem;
+      color: var(--text3);
+    }
+    .tinder-content {
+      padding: 24px;
+    }
+    .tinder-type {
+      font-size: 0.7rem;
+      color: var(--text3);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 12px;
+    }
+    .tinder-title {
+      font-size: 1.4rem;
+      font-weight: 600;
+      line-height: 1.4;
+      margin-bottom: 16px;
+    }
+    .tinder-source {
+      font-size: 0.85rem;
+      color: var(--text2);
+    }
+    .tinder-stamp {
+      position: absolute;
+      top: 32px;
+      padding: 12px 24px;
+      border-radius: var(--card-radius);
+      font-size: 2rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 4px;
+      opacity: 0;
+      transform: rotate(-15deg) scale(0.8);
+      transition: var(--transition);
+      z-index:     .tinder10;
+    }
+-stamp.show { opacity: 1; transform: rotate(-15deg) scale(1); }
+    .tinder-stamp.like { right: 32px; background: var(--accent); color: white; }
+    .tinder-stamp.nope { left: 32px; background: var(--bg4); color: white; transform: rotate(15deg); }
+    .tinder-stamp.nope.show { transform: rotate(15deg) scale(1); }
+    .tinder-controls {
+      display: flex;
+      gap: 16px;
+      margin-top: 32px;
+    }
+    .tinder-btn {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      border: 2px solid var(--border);
+      background: var(--bg2);
+      color: var(--text2);
+      cursor: pointer;
+      font-size: 1.4rem;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .tinder-btn:hover { transform: scale(1.1); }
+    .tinder-btn.nope:hover { border-color: var(--text2); color: var(--text); }
+    .tinder-btn.undo:hover { border-color: #ffaa00; color: #ffaa00; }
+    .tinder-btn.like:hover { border-color: var(--accent); color: var(--accent); }
+    .tinder-progress {
+      margin-top: 20px;
+      font-size: 0.85rem;
+      color: var(--text3);
+    }
+    /* Likes/Archive Views */
+    .section-view { display: none; }
+    .section-view.active { display: block; }
+    .section-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+      letter-spacing: -0.02em;
+    }
+    .section-desc {
+      font-size: 0.85rem;
+      color: var(--text3);
+      margin-bottom: 32px;
+    }
+    /* Empty State */
+    .empty {
+      text-align: center;
+      padding: 80px 20px;
+      color: var(--text3);
+    }
+    .empty-icon { font-size: 4rem; margin-bottom: 16px; opacity: 0.3; }
+    .empty-title { font-size: 1.1rem; font-weight: 500; color: var(--text2); margin-bottom: 8px; }
+    /* Modal */
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+      opacity: 0;
+      visibility: hidden;
+      transition: var(--transition);
+    }
+    .modal.active { opacity: 1; visibility: visible; }
+    .modal-inner {
+      background: var(--bg2);
+      border-radius: var(--card-radius);
+      width: 90%;
+      max-width: 480px;
+      padding: 32px;
+      transform: translateY(20px);
+      transition: var(--transition);
+    }
+    .modal.active .modal-inner { transform: translateY(0); }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+    .modal-title { font-size: 1.1rem; font-weight: 600; }
+    .modal-close {
+      width: 32px;
+      height: 32px;
+      border: none;
+      background: transparent;
+      color: var(--text2);
+      cursor: pointer;
+      font-size: 1.2rem;
+    }
+    .form-group { margin-bottom: 20px; }
+    .form-label { display: block; font-size: 0.8rem; color: var(--text2); margin-bottom: 8px; }
+    .form-select {
+      width: 100%;
+      padding: 12px;
+      border-radius: var(--card-radius);
+      border: 1px solid var(--border);
+      background: var(--bg3);
+      color: var(--text);
+      font-size: 0.9rem;
+    }
+    .btn {
+      width: 100%;
+      padding: 14px;
+      border-radius: var(--card-radius);
+      border: none;
+      background: var(--text);
+      color: var(--bg);
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .btn:hover { opacity: 0.9; }
+    .demo-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      background: rgba(34, 197, 94, 0.1);
+      border: 1px solid rgba(34, 197, 94, 0.3);
+      border-radius: var(--card-radius);
+      color: #22c55e;
+      font-size: 0.8rem;
+      margin-bottom: 20px;
+    }
+    /* Toast */
+    .toast-container {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 300;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .toast {
+      padding: 12px 20px;
+      background: var(--bg3);
+      border-radius: var(--card-radius);
+      font-size: 0.85rem;
+      animation: toastIn 0.3s ease;
+    }
+    @keyframes toastIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    /* Confirm */
+    .confirm {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 250;
+      opacity: 0;
+      visibility: hidden;
+      transition: var(--transition);
+    }
+    .confirm.active { opacity: 1; visibility: visible; }
+    .confirm-box {
+      background: var(--bg2);
+      border-radius: var(--card-radius);
+      padding: 32px;
+      text-align: center;
+      max-width: 320px;
+    }
+    .confirm-icon { font-size: 2.5rem; margin-bottom: 16px; }
+    .confirm-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 8px; }
+    .confirm-text { font-size: 0.85rem; color: var(--text2); margin-bottom: 24px; }
+    .confirm-actions { display: flex; gap: 12px; justify-content: center; }
+    .confirm-btn {
+      padding: 10px 24px;
+      border-radius: var(--card-radius);
+      border: none;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+    }
+    .confirm-btn.cancel { background: var(--bg3); color: var(--text2); }
+    .confirm-btn.danger { background: var(--accent); color: white; }
+    /* Responsive */
+    @media (max-width: 768px) {
+      header { padding: 0 16px; height: 56px; }
+      main { padding: 72px 16px 40px; }
+      .masonry { columns: 2 150px; column-gap: 12px; }
+      .card { margin-bottom: 12px; }
+      .nav-btn span { display: none; }
+      .tinder-stack { height: 480px; }
+    }
   </style>
 </head>
 <body>
   <header>
-    <div class="logo"><div class="logn">📡</div><div class="logt"><span>Media</span> Pulse</div></div>
+    <div class="logo"><span>●</span> Media Pulse</div>
     <nav class="nav">
-      <button class="nb on" data-mode="grid" onclick="setMode('grid')"><span class="ic">📋</span><span>一覧</span></button>
-      <button class="nb" data-mode="tinder" onclick="setMode('tinder')"><span class="ic">💘</span><span>スワイプ</span></button>
-      <button class="nb" data-mode="likes" onclick="setMode('likes')"><span class="ic">❤️</span><span>いいね</span></button>
-      <button class="nb" data-mode="archive" onclick="setMode('archive')"><span class="ic">📦</span><span>保留</span></button>
+      <button class="nav-btn active" data-mode="grid" onclick="setMode('grid')">Explorer</button>
+      <button class="nav-btn" data-mode="tinder" onclick="setMode('tinder')">Swipe</button>
+      <button class="nav-btn" data-mode="likes" onclick="setMode('likes')">Collected</button>
+      <button class="nav-btn" data-mode="archive" onclick="setMode('archive')">Archive</button>
     </nav>
-    <div class="acts">
-      <button class="ab" onclick="refreshAll()" title="更新">🔄</button>
-      <button class="ab" onclick="openSettings()" title="設定">⚙️</button>
+    <div class="header-actions">
+      <button class="action-btn" onclick="refreshAll()">↻</button>
+      <button class="action-btn" onclick="openSettings()">⚙</button>
     </div>
   </header>
   <main>
     <div id="grid-view">
-      <div class="filt">
-        <button class="fc on" data-filter="all">すべて</button>
-        <button class="fc" data-filter="youtube">📺 YouTube</button>
-        <button class="fc" data-filter="rss">📰 RSS</button>
-        <button class="fc" data-filter="book">📚 本</button>
-        <button class="fc" data-filter="movie">🎬 映画</button>
-        <button class="fc" data-filter="podcast">🎙️ Podcast</button>
+      <div class="filter-bar">
+        <button class="filter-btn active" data-filter="all">All</button>
+        <button class="filter-btn" data-filter="youtube">YouTube</button>
+        <button class="filter-btn" data-filter="rss">RSS</button>
+        <button class="filter-btn" data-filter="book">Books</button>
+        <button class="filter-btn" data-filter="movie">Film</button>
+        <button class="filter-btn" data-filter="podcast">Podcast</button>
       </div>
-      <div class="stats">
-        <div class="sc"><div class="si t">📚</div><div class="sv"><span class="svv" id="total-count">0</span><span class="svl">Total</span></div></div>
-        <div class="sc"><div class="si l">❤️</div><div class="sv"><span class="svv" id="like-count">0</span><span class="svl">いいね</span></div></div>
-        <div class="sc"><div class="si a">📦</div><div class="sv"><span class="svv" id="archive-count">0</span><span class="svl">保留</span></div></div>
+      <div class="stats-bar">
+        <div class="stat"><span class="stat-num" id="total-count">0</span><span class="stat-label">Total</span></div>
+        <div class="stat"><span class="stat-num" id="like-count">0</span><span class="stat-label">Collected</span></div>
+        <div class="stat"><span class="stat-num" id="archive-count">0</span><span class="stat-label">Archive</span></div>
       </div>
-      <div class="cg" id="cards"></div>
+      <div class="masonry" id="cards"></div>
     </div>
-    <div class="tc" id="tinder-view">
-      <div class="ts">
-        <div class="tcard" id="tinder-card">
-          <div class="tss lk">LIKE</div>
-          <div class="tss np">NOPE</div>
-          <img class="ti" id="tinder-img" src="" alt="">
-          <div class="tcon">
-            <div class="tty" id="tinder-type"></div>
-            <div class="tt" id="tinder-title"></div>
-            <div class="td" id="tinder-date"></div>
+    <div class="tinder-view" id="tinder-view">
+      <div class="tinder-stack">
+        <div class="tinder-card" id="tinder-card">
+          <div class="tinder-stamp like">LIKE</div>
+          <div class="tinder-stamp nope">NOPE</div>
+          <img class="tinder-img" id="tinder-img" src="" alt="">
+          <div class="tinder-content">
+            <div class="tinder-type" id="tinder-type"></div>
+            <div class="tinder-title" id="tinder-title"></div>
+            <div class="tinder-source" id="tinder-source"></div>
           </div>
         </div>
       </div>
-      <div class="thi"><span>← スワイプでパス</span><span>スワイプでいいね →</span></div>
-      <div class="tctl">
-        <button class="tb np" onclick="tinderNope()">✕</button>
-        <button class="tb ud" onclick="undoLast()">↩️</button>
-        <button class="tb lk" onclick="tinderLike()">❤️</button>
+      <div class="tinder-controls">
+        <button class="tinder-btn nope" onclick="tinderNope()">✕</button>
+        <button class="tinder-btn undo" onclick="undoLast()">↩</button>
+        <button class="tinder-btn like" onclick="tinderLike()">♥</button>
       </div>
-      <div class="tpr" id="tinder-progress"></div>
+      <div class="tinder-progress" id="tinder-progress"></div>
     </div>
-    <div id="likes-view" style="display:none;">
-      <h2 class="st">❤️ いいねしたコンテンツ</h2>
-      <p class="sd">後で見たいコンテンツを收藏</p>
-      <div class="cg" id="likes-cards"></div>
+    <div class="section-view" id="likes-view">
+      <h2 class="section-title">Collected</h2>
+      <p class="section-desc">Saved content for later</p>
+      <div class="masonry" id="likes-cards"></div>
     </div>
-    <div id="archive-view" style="display:none;">
-      <h2 class="st">📦 保留したコンテンツ</h2>
-      <p class="sd">パスしたコンテンツ。一時保存されます</p>
-      <div class="cg" id="archive-cards"></div>
+    <div class="section-view" id="archive-view">
+      <h2 class="section-title">Archive</h2>
+      <p class="section-desc">Previously passed content</p>
+      <div class="masonry" id="archive-cards"></div>
     </div>
   </main>
-  <div class="mo" id="settings-modal">
-    <div class="m">
-      <div class="mh"><h2 class="mt">設定</h2><button class="mc" onclick="closeSettings()">×</button></div>
-      <div class="mb">
-        <div class="db">🎉 デモモード動作中</div>
-        <div class="fg"><label class="fl">デモデータのカテゴリ</label><select class="fs" id="demo-source" onchange="updateDemoSource()"><option value="tech">💻 テクノロジー・テック</option><option value="entertainment">🎬 エンタメ・映画</option><option value="news">📰 ニュース</option><option value="science">🔬 科学・教育</option><option value="podcast">🎙️ ポッドキャスト</option></select></div>
-        <button class="bp" onclick="loadDemoData()">デモデータを読み込む</button>
+  <div class="modal" id="settings-modal">
+    <div class="modal-inner">
+      <div class="modal-header">
+        <h2 class="modal-title">Settings</h2>
+        <button class="modal-close" onclick="closeSettings()">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="demo-badge">Demo Mode Active</div>
+        <div class="form-group">
+          <label class="form-label">Content Category</label>
+          <select class="form-select" id="demo-source" onchange="updateDemoSource()">
+            <option value="tech">Tech & Code</option>
+            <option value="entertainment">Film & Entertainment</option>
+            <option value="news">News</option>
+            <option value="science">Science</option>
+            <option value="podcast">Podcasts</option>
+          </select>
+        </div>
+        <button class="btn" onclick="loadDemoData()">Load Demo Data</button>
       </div>
     </div>
   </div>
-  <div class="co" id="confirm-overlay">
-    <div class="cbx">
-      <div class="ci">🗑️</div>
-      <div class="cti" id="confirm-title">削除しますか？</div>
-      <div class="ctx" id="confirm-text">この操作は取り消せません</div>
-      <div class="ca2"><button class="cb2 cl" onclick="closeConfirm()">キャンセル</button><button class="cb2 dg" onclick="confirmDelete()">削除</button></div>
+  <div class="confirm" id="confirm">
+    <div class="confirm-box">
+      <div class="confirm-icon">🗑</div>
+      <div class="confirm-title" id="confirm-title">Remove?</div>
+      <div class="confirm-text" id="confirm-text">This cannot be undone</div>
+      <div class="confirm-actions">
+        <button class="confirm-btn cancel" onclick="closeConfirm()">Cancel</button>
+        <button class="confirm-btn danger" onclick="confirmDelete()">Remove</button>
+      </div>
     </div>
   </div>
-  <div class="tc2" id="toasts"></div>
+  <div class="toast-container" id="toasts"></div>
   <script>
-    let state={items:[],filter:'all',currentMode:'grid',tinderIndex:0,tinderHistory:[],demoSource:'tech'};
-    let deleteTarget=null;
-    const demoData={
-      tech:[
-        {id:1,type:'youtube',title:'【完全版】React 19 新機能総まとめ',source:'WebMaster',thumbnail:'https://i.ytimg.com/vi/dQw4w9WgXcQ/maxresdefault.jpg',date:'2026-02-17',url:'https://youtube.com',liked:false,archived:false},
-        {id:2,type:'youtube',title:'Claude API完全ガイド - AIエージェント',source:'CodeLab',thumbnail:'https://i.ytimg.com/vi/ClaudeAPI/maxresdefault.jpg',date:'2026-02-17',url:'https://youtube.com',liked:false,archived:false},
-        {id:3,type:'rss',title:'新しいJavaScriptフレームワーク発表',source:'TechCrunch JP',thumbnail:'',date:'2026-02-17',url:'https://techcrunch.jp',liked:false,archived:false},
-        {id:4,type:'podcast',title:'#195 ゆっくり解説：宇宙の謎',source:'科学Podcast',thumbnail:'',date:'2026-02-16',url:'https://spotify.com',liked:false,archived:false},
-        {id:5,type:'book',title:'ソフトウェア設計のGem',source:'技術評論社',thumbnail:'',date:'2026-02-16',url:'https://gihyo.jp',liked:false,archived:false},
-        {id:6,type:'movie',title:'スマート、AIが人間を的操作を開始',source:'MovieDB',thumbnail:'',date:'2026-02-15',url:'https://moviedb.org',liked:false,archived:false},
-        {id:7,type:'youtube',title:'vimは死なない - カスタマイズ沼',source:'Linux Fan',thumbnail:'https://i.ytimg.com/vi/vim/maxresdefault.jpg',date:'2026-02-15',url:'https://youtube.com',liked:false,archived:false},
-        {id:8,type:'rss',title:'TypeScript 6.0 予想まとめ',source:'TS Weekly',thumbnail:'',date:'2026-02-14',url:'https://example.com',liked:false,archived:false}
+    let state = { items: [], filter: 'all', currentMode: 'grid', tinderIndex: 0, tinderHistory: [], demoSource: 'tech' };
+    let deleteTarget = null;
+    
+    const demoData = {
+      tech: [
+        {id:1,type:'youtube',title:'Complete Guide to React 19 - Everything You Need to Know',source:'WebMaster',thumbnail:'https://i.ytimg.com/vi/dQw4w9WgXcQ/maxresdefault.jpg',date:'2026-02-17',url:'https://youtube.com',liked:false,archived:false},
+        {id:2,type:'youtube',title:'Building AI Agents with Claude API - Full Tutorial',source:'CodeLab',thumbnail:'https://i.ytimg.com/vi/ClaudeAPI/maxresdefault.jpg',date:'2026-02-17',url:'https://youtube.com',liked:false,archived:false},
+        {id:3,type:'rss',title:'New JavaScript Framework Announced - What You Need to Know',source:'TechCrunch',thumbnail:'',date:'2026-02-17',url:'https://techcrunch.jp',liked:false,archived:false},
+        {id:4,type:'podcast',title:'Episode 195: Exploring the Mysteries of the Universe',source:'Science Podcast',thumbnail:'',date:'2026-02-16',url:'https://spotify.com',liked:false,archived:false},
+        {id:5,type:'book',title:'Software Design Patterns - Essential Guide',source:'O Reilly',thumbnail:'',date:'2026-02-16',url:'https://oreilly.com',liked:false,archived:false},
+        {id:6,type:'movie',title:'When AI Gains Consciousness - A New Era Begins',source:'MovieDB',thumbnail:'',date:'2026-02-15',url:'https://moviedb.org',liked:false,archived:false},
+        {id:7,type:'youtube',title:'Vim Will Never Die - The Deep End of Customization',source:'Linux Fan',thumbnail:'https://i.ytimg.com/vi/vim/maxresdefault.jpg',date:'2026-02-15',url:'https://youtube.com',liked:false,archived:false},
+        {id:8,type:'rss',title:'TypeScript 6.0 Predictions - The Type System Evolution',source:'TS Weekly',thumbnail:'',date:'2026-02-14',url:'https://example.com',liked:false,archived:false}
       ],
-      entertainment:[
-        {id:1,type:'youtube',title:'2026年冬アニメTOP10',source:'AnimeHype',thumbnail:'https://i.ytimg.com/vi/anime/maxresdefault.jpg',date:'2026-02-17',url:'https://youtube.com',liked:false,archived:false},
-        {id:2,type:'movie',title:'待望の続編！名作の新作公開',source:'Cinema',thumbnail:'',date:'2026-02-17',url:'https://moviedb.org',liked:false,archived:false},
-        {id:3,type:'youtube',title:'有名監督語る！映画作り',source:'DirectorTalk',thumbnail:'https://i.ytimg.com/vi/dir/maxresdefault.jpg',date:'2026-02-16',url:'https://youtube.com',liked:false,archived:false},
-        {id:4,type:'podcast',title:'映画トーク：アカデミー賞予想',source:'FilmTalk',thumbnail:'',date:'2026-02-16',url:'https://spotify.com',liked:false,archived:false},
-        {id:5,type:'movie',title:'アカデミー賞ノミネート解説',source:'Oscar2026',thumbnail:'',date:'2026-02-15',url:'https://oscars.com',liked:false,archived:false}
+      entertainment: [
+        {id:1,type:'youtube',title:'Winter 2026 Anime Ranking TOP 10',source:'AnimeHype',thumbnail:'https://i.ytimg.com/vi/anime/maxresdefault.jpg',date:'2026-02-17',url:'https://youtube.com',liked:false,archived:false},
+        {id:2,type:'movie',title:'Long-Awaited Sequel Finally Released',source:'Cinema',thumbnail:'',date:'2026-02-17',url:'https://moviedb.org',liked:false,archived:false},
+        {id:3,type:'youtube',title:'Famous Directors Discuss Film Making',source:'DirectorTalk',thumbnail:'https://i.ytimg.com/vi/dir/maxresdefault.jpg',date:'2026-02-16',url:'https://youtube.com',liked:false,archived:false},
+        {id:4,type:'podcast',title:'Oscar Predictions 2026 - Film Talk',source:'FilmTalk',thumbnail:'',date:'2026-02-16',url:'https://spotify.com',liked:false,archived:false}
       ],
-      news:[
-        {id:1,type:'rss',title:'主要紙伝える経済News',source:'日本経済新聞',thumbnail:'',date:'2026-02-17',url:'https://nikkei.com',liked:false,archived:false},
-        {id:2,type:'rss',title:'政府新しい政策発表',source:'NHK',thumbnail:'',date:'2026-02-17',url:'https://nhk.jp',liked:false,archived:false},
-        {id:3,type:'rss',title:'テック業界大型M&A',source:'TechCrunch',thumbnail:'',date:'2026-02-16',url:'https://techcrunch.jp',liked:false,archived:false},
-        {id:4,type:'rss',title:'環境問題 最新報告',source:'Greenpeace',thumbnail:'',date:'2026-02-15',url:'https://greenpeace.org',liked:false,archived:false}
+      news: [
+        {id:1,type:'rss',title:'Breaking: Major Economic News',source:'Nikkei',thumbnail:'',date:'2026-02-17',url:'https://nikkei.com',liked:false,archived:false},
+        {id:2,type:'rss',title:'Government Announces New Policy',source:'NHK',thumbnail:'',date:'2026-02-17',url:'https://nhk.jp',liked:false,archived:false},
+        {id:3,type:'rss',title:'Tech Industry Mega Merger Announced',source:'TechCrunch',thumbnail:'',date:'2026-02-16',url:'https://techcrunch.jp',liked:false,archived:false}
       ],
-      science:[
-        {id:1,type:'youtube',title:'宇宙の起源から未来まで',source:'NASA',thumbnail:'https://i.ytimg.com/vi/space/maxresdefault.jpg',date:'2026-02-17',url:'https://youtube.com',liked:false,archived:false},
-        {id:2,type:'rss',title:'量子コンピュータの進歩',source:'ScienceDaily',thumbnail:'',date:'2026-02-16',url:'https://sciencedaily.com',liked:false,archived:false},
-        {id:3,type:'youtube',title:'脳科学が解明する集中力',source:'BrainScience',thumbnail:'https://i.ytimg.com/vi/brain/maxresdefault.jpg',date:'2026-02-15',url:'https://youtube.com',liked:false,archived:false},
-        {id:4,type:'podcast',title:'AIの次のステップ',source:'MIT Tech',thumbnail:'',date:'2026-02-14',url:'https://spotify.com',liked:false,archived:false}
+      science: [
+        {id:1,type:'youtube',title:'From the Big Bang to the Future - Complete Documentary',source:'NASA',thumbnail:'https://i.ytimg.com/vi/space/maxresdefault.jpg',date:'2026-02-17',url:'https://youtube.com',liked:false,archived:false},
+        {id:2,type:'rss',title:'Quantum Computing Breakthrough Announced',source:'ScienceDaily',thumbnail:'',date:'2026-02-16',url:'https://sciencedaily.com',liked:false,archived:false},
+        {id:3,type:'youtube',title:'The Science of Focus - Brain Explained',source:'BrainScience',thumbnail:'https://i.ytimg.com/vi/brain/maxresdefault.jpg',date:'2026-02-15',url:'https://youtube.com',liked:false,archived:false}
       ],
-      podcast:[
-        {id:1,type:'podcast',title:'#198 ゆる言語学ラジオ',source:'ゆる言語学',thumbnail:'',date:'2026-02-17',url:'https://spotify.com',liked:false,archived:false},
-        {id:2,type:'podcast',title:'積ん読Channels最新回',source:'積ん読',thumbnail:'',date:'2026-02-16',url:'https://spotify.com',liked:false,archived:false},
-        {id:3,type:'podcast',title:'#45 岡本真帆インタビュー',source:'本を読もう',thumbnail:'',date:'2026-02-15',url:'https://spotify.com',liked:false,archived:false},
-        {id:4,type:'podcast',title:'#220 宮藤官九郎語る',source:'映畫人生',thumbnail:'',date:'2026-02-14',url:'https://spotify.com',liked:false,archived:false}
+      podcast: [
+        {id:1,type:'podcast',title:'Episode 198: Yuru Language Radio',source:'Yuru',thumbnail:'',date:'2026-02-17',url:'https://spotify.com',liked:false,archived:false},
+        {id:2,type:'podcast',title:'Tsundoku Channel Latest Episode',source:'Tsundoku',thumbnail:'',date:'2026-02-16',url:'https://spotify.com',liked:false,archived:false},
+        {id:3,type:'podcast',title:'Episode 45: Okamoto Interview',source:'Books',thumbnail:'',date:'2026-02-15',url:'https://spotify.com',liked:false,archived:false}
       ]
     };
-    function init(){loadDemoData();setupEvents();render();}
-    function loadDemoData(){state.items=demoData[state.demoSource]||demoData.tech;
+    
+    function init() {
+      loadDemoData();
+      setupEvents();
     }
-    function setupEvents(){
-      document.querySelectorAll('.fc').forEach(b=>{
-        b.addEventListener('click',()=>{
-          document.querySelectorAll('.fc').forEach(x=>x.classList.remove('on'));
-          b.classList.add('on');
-          state.filter=b.dataset.filter;
-          if(state.currentMode==='tinder')init();
+    
+    function loadDemoData() {
+      state.items = demoData[state.demoSource] || demoData.tech;
+      render();
+      showToast('Data loaded');
+    }
+    
+    function setupEvents() {
+      document.querySelectorAll('.filter-btn').forEach(b => {
+        b.addEventListener('click', () => {
+          document.querySelectorAll('.filter-btn').forEach(x => x.classList.remove('active'));
+          b.classList.add('active');
+          state.filter = b.dataset.filter;
+          if (state.currentMode === 'tinder') initTinder();
           render();
         });
       });
     }
-    function setMode(m){
-      state.currentMode=m;
-      document.querySelectorAll('.nb').forEach(b=>b.classList.toggle('on',b.dataset.mode===m));
-      document.getElementById('grid-view').style.display=m==='grid'?'block':'none';
-      document.getElementById('tinder-view').classList.toggle('on',m==='tinder');
-      document.getElementById('likes-view').style.display=m==='likes'?'block':'none';
-      document.getElementById('archive-view').style.display=m==='archive'?'block':'none';
-      if(m==='tinder')init();
-      if(m==='archive')renderArchive();
-      render();
+    
+    function setMode(m) {
+      state.currentMode = m;
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.mode === m));
+      document.getElementById('grid-view').style.display = m === 'grid' ? 'block' : 'none';
+      document.getElementById('tinder-view').classList.toggle('active', m === 'tinder');
+      document.getElementById('likes-view').classList.toggle('active', m === 'likes');
+      document.getElementById('archive-view').classList.toggle('active', m === 'archive');
+      if (m === 'tinder') initTinder();
+      if (m === 'likes') renderLikes();
+      if (m === 'archive') renderArchive();
     }
-    function render(){
-      let items=state.filter==='all'?state.items:state.items.filter(x=>x.type===state.filter);
-      if(!items.length){document.getElementById('cards').innerHTML='<div class="es"><div class="eic">📭</div><div class="eti">まだ何もないよ</div></div>';return;}
-      document.getElementById('cards').innerHTML=items.map((x,i)=>
-        `<div class="card" style="animation-delay:${i*0.05}s" onclick="window.open('${x.url}','_blank')">
-          ${x.thumbnail?`<img class="cth" src="${x.thumbnail}">`:''}
-          <div class="cb">
-            <div class="cm"><span class="ct ${x.type}">${x.type==='youtube'?'📺':x.type==='rss'?'📰':x.type==='book'?'📚':x.type==='movie'?'🎬':'🎙️'}</span><span class="cs">${x.source}</span></div>
-            <div class="ctt">${x.title}</div>
-            <div class="cf"><span class="cd">📅 ${x.date}</span>
-            <div class="ca">${x.liked?`<button class="cab lk" onclick="event.stopPropagation();toggleLike(${x.id})">❤️</button>`:''}${x.archived?`<button class="cab ar" onclick="event.stopPropagation();toggleArchive(${x.id})">📦</button>`:''}</div>
-            </div>
-          </div>
-        </div>`
-      ).join('');
-      document.getElementById('total-count').textContent=state.items.length;
-      document.getElementById('like-count').textContent=state.items.filter(x=>x.liked).length;
-      document.getElementById('archive-count').textContent=state.items.filter(x=>x.archived).length;
-    }
-    function renderArchive(){
-      const items=state.items.filter(x=>x.archived);
-      if(!items.length){document.getElementById('archive-cards').innerHTML='<div class="es"><div class="eic">📦</div><div class="eti">アーカイブは空だよ</div></div>';return;}
-      document.getElementById('archive-cards').innerHTML=items.map((x,i)=>
-        `<div class="card" style="animation-delay:${i*0.05}s" onclick="window.open('${x.url}','_blank')">
-          ${x.thumbnail?`<img class="cth" src="${x.thumbnail}">`:''}
-          <div class="cb">
-            <div class="cm"><span class="ct ${x.type}">${x.type==='youtube'?'📺':x.type==='rss'?'📰':x.type==='book'?'📚':x.type==='movie'?'🎬':'🎙️'}</span><span class="cs">${x.source}</span></div>
-            <div class="ctt">${x.title}</div>
-            <div class="cf"><span class="cd">📅 ${x.date}</span><button class="cab" onclick="event.stopPropagation();restoreArchive(${x.id})">↩️</button></div>
-          </div>
-        </div>`
-      ).join('');
-    }
-    function renderLikes(){
-      const items=state.items.filter(x=>x.liked);
-      if(!items.length){document.getElementById('likes-cards').innerHTML='<div class="es"><div class="eic">💔</div><div class="eti">いいねしたものはないよ</div></div>';return;}
-      document.getElementById('likes-cards').innerHTML=items.map((x,i)=>
-        `<div class="card" style="animation-delay:${i*0.05}s" onclick="window.open('${x.url}','_blank')">
-          ${x.thumbnail?`<img class="cth" src="${x.thumbnail}">`:''}
-          <div class="cb">
-            <div class="cm"><span class="ct ${x.type}">${x.type==='youtube'?'📺':x.type==='rss'?'📰':x.type==='book'?'📚':x.type==='movie'?'🎬':'🎙️'}</span><span class="cs">${x.source}</span></div>
-            <div class="ctt">${x.title}</div>
-            <div class="cf"><span class="cd">📅 ${x.date}</span><button class="cab" onclick="event.stopPropagation();removeLike(${x.id})">🗑️</button></div>
-          </div>
-        </div>`
-      ).join('');
-    }
-    function init(){
-      state.tinderIndex=0;
-      state.tinderHistory=[];
-      updateTinderCard();
-    }
-    function getFilteredItems(){
-      return state.filter==='all'?state.items:state.items.filter(x=>x.type===state.filter);
-    }
-    function updateTinderCard(){
-      const items=getFilteredItems();
-      const card=document.getElementById('tinder-card');
-      const stl=card.querySelector('.tss.lk');
-      const stn=card.querySelector('.tss.np');
-      card.style.transition='none';
-      card.style.transform='';
-      card.classList.remove('sl','sr');
-      stl.classList.remove('sh');
-      stn.classList.remove('sh');
-      if(state.tinderIndex>=items.length){
-        document.getElementById('tinder-img').src='';
-        document.getElementById('tinder-type').innerHTML='';
-        document.getElementById('tinder-title').textContent='すべてチェックしたよ！';
-        document.getElementById('tinder-date').textContent='';
-        document.getElementById('tinder-progress').textContent='';
+    
+    function render() {
+      let items = state.filter === 'all' ? state.items : state.items.filter(x => x.type === state.filter);
+      if (!items.length) {
+        document.getElementById('cards').innerHTML = '<div class="empty"><div class="empty-icon">○</div><div class="empty-title">No content yet</div></div>';
         return;
       }
-      const it=items[state.tinderIndex];
-      document.getElementById('tinder-img').src=it.thumbnail||'';
-      document.getElementById('tinder-type').innerHTML=`<span class="ct ${it.type}">${it.type==='youtube'?'📺':it.type==='rss'?'📰':it.type==='book'?'📚':it.type==='movie'?'🎬':'🎙️'}</span> ${it.source}`;
-      document.getElementById('tinder-title').textContent=it.title;
-      document.getElementById('tinder-date').textContent=`📅 ${it.date}`;
-      document.getElementById('tinder-progress').textContent=`${state.tinderIndex+1}/${items.length}`;
+      document.getElementById('cards').innerHTML = items.map(x => `
+        <div class="card" onclick="window.open('${x.url}', '_blank')">
+          <div class="card-img-wrap">
+            ${x.thumbnail ? `<img class="card-img" src="${x.thumbnail}" alt="">` : `<div class="card-img empty">${x.type === 'youtube' ? '▶' : x.type === 'rss' ? '📰' : x.type === 'book' ? '📚' : x.type === 'movie' ? '🎬' : '🎙'}</div>`}
+            <div class="card-overlay">
+              <div class="card-actions-overlay">
+                ${x.liked ? '' : `<button class="card-action" onclick="event.stopPropagation();toggleLike(${x.id})">♥</button>`}
+                ${x.archived ? '' : `<button class="card-action" onclick="event.stopPropagation();toggleArchive(${x.id})">○</button>`}
+              </div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="card-type">${x.type}</div>
+            <div class="card-title">${x.title}</div>
+            <div class="card-meta">
+              <span class="card-source">${x.source}</span>
+              <div class="card-actions-mini">
+                ${x.liked ? `<button class="card-btn-mini liked" onclick="event.stopPropagation();toggleLike(${x.id})">♥</button>` : ''}
+                ${x.archived ? `<button class="card-btn-mini" onclick="event.stopPropagation();restoreArchive(${x.id})">↩</button>` : ''}
+              </div>
+            </div>
+          </div>
+        </div>
+      `).join('');
+      
+      document.getElementById('total-count').textContent = state.items.length;
+      document.getElementById('like-count').textContent = state.items.filter(x => x.liked).length;
+      document.getElementById('archive-count').textContent = state.items.filter(x => x.archived).length;
     }
-    function handleSwipe(d){
-      const items=getFilteredItems();
-      if(state.tinderIndex>=items.length)return;
-      const item=items[state.tinderIndex];
-      if(d==='right'){
-        item.liked=true;
-        state.tinderHistory.push({index:state.tinderIndex,liked:true});
-      }else{
-        item.archived=true;
-        state.tinderHistory.push({index:state.tinderIndex,liked:false});
+    
+    function renderLikes() {
+      const items = state.items.filter(x => x.liked);
+      if (!items.length) {
+        document.getElementById('likes-cards').innerHTML = '<div class="empty"><div class="empty-icon">♡</div><div class="empty-title">Nothing collected</div></div>';
+        return;
       }
-      card.style.transition='transform 0.3s,opacity 0.3s';
-      card.style.transform=`translateX(${d==='right'?500:-500}px) rotate(${d==='right'?30:-30}deg)`;
-      card.style.opacity='0';
-      setTimeout(()=>{
-        state.tinderIndex++;
-        card.style.transition='none';
-        card.style.transform='';
-        card.style.opacity='';
-        stl.classList.remove('sh');
-        stn.classList.remove('sh');
-        updateTinderCard();
-      },300);
+      document.getElementById('likes-cards').innerHTML = items.map(x => `
+        <div class="card" onclick="window.open('${x.url}', '_blank')">
+          <div class="card-img-wrap">
+            ${x.thumbnail ? `<img class="card-img" src="${x.thumbnail}" alt="">` : `<div class="card-img empty">${x.type === 'youtube' ? '▶' : x.type === 'rss' ? '📰' : x.type === 'book' ? '📚' : x.type === 'movie' ? '🎬' : '🎙'}</div>`}
+          </div>
+          <div class="card-body">
+            <div class="card-type">${x.type}</div>
+            <div class="card-title">${x.title}</div>
+            <div class="card-meta">
+              <span class="card-source">${x.source}</span>
+              <button class="card-btn-mini" onclick="event.stopPropagation();removeLike(${x.id})">🗑</button>
+            </div>
+          </div>
+        </div>
+      `).join('');
     }
-    function tinderLike(){handleSwipe('right');}
-    function tinderNope(){handleSwipe('left');}
-    function undoLast(){
-      if(state.tinderHistory.length===0){showToast('もどるものないよ');return;}
-      const last=state.tinderHistory.pop();
-      state.tinderIndex=last.index;
-      const items=getFilteredItems();
-      if(items[last.index]){
-        if(last.liked){items[last.index].liked=false;items[last.index].archived=false;}
-        else{items[last.index].archived=false;}
+    
+    function renderArchive() {
+      const items = state.items.filter(x => x.archived);
+      if (!items.length) {
+        document.getElementById('archive-cards').innerHTML = '<div class="empty"><div class="empty-icon">○</div><div class="empty-title">Archive is empty</div></div>';
+        return;
+      }
+      document.getElementById('archive-cards').innerHTML = items.map(x => `
+        <div class="card" onclick="window.open('${x.url}', '_blank')">
+          <div class="card-img-wrap">
+            ${x.thumbnail ? `<img class="card-img" src="${x.thumbnail}" alt="">` : `<div class="card-img empty">${x.type === 'youtube' ?
+> '▶' : x.type === 'rss' ? '📰' : x.type === 'book' ? '📚' : x.type === 'movie' ? '🎬' : '🎙'}</div>`}
+          </div>
+          <div class="card-body">
+            <div class="card-type">${x.type}</div>
+            <div class="card-title">${x.title}</div>
+            <div class="card-meta">
+              <span class="card-source">${x.source}</span>
+              <button class="card-btn-mini" onclick="event.stopPropagation();restoreArchive(${x.id})">↩</button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+    
+    function initTinder() {
+      state.tinderIndex = 0;
+      state.tinderHistory = [];
+      updateTinderCard();
+    }
+    
+    function getFilteredItems() {
+      return state.filter === 'all' ? state.items : state.items.filter(x => x.type === state.filter);
+    }
+    
+    function updateTinderCard() {
+      const items = getFilteredItems();
+      const card = document.getElementById('tinder-card');
+      const sl = card.querySelector('.tinder-stamp.like');
+      const sn = card.querySelector('.tinder-stamp.nope');
+      
+      card.style.transition = 'none';
+      card.style.transform = '';
+      sl.classList.remove('show');
+      sn.classList.remove('show');
+      
+      if (state.tinderIndex >= items.length) {
+        document.getElementById('tinder-img').src = '';
+        document.getElementById('tinder-img').classList.add('empty');
+        document.getElementById('tinder-type').textContent = '';
+        document.getElementById('tinder-title').textContent = 'All caught up!';
+        document.getElementById('tinder-source').textContent = '';
+        document.getElementById('tinder-progress').textContent = '';
+        return;
+      }
+      
+      const it = items[state.tinderIndex];
+      const img = document.getElementById('tinder-img');
+      img.src = it.thumbnail || '';
+      if (!it.thumbnail) img.classList.add('empty');
+      else img.classList.remove('empty');
+      document.getElementById('tinder-type').textContent = it.type.toUpperCase();
+      document.getElementById('tinder-title').textContent = it.title;
+      document.getElementById('tinder-source').textContent = it.source + ' · ' + it.date;
+      document.getElementById('tinder-progress').textContent = (state.tinderIndex + 1) + ' / ' + items.length;
+    }
+    
+    function handleSwipe(direction) {
+      const items = getFilteredItems();
+      if (state.tinderIndex >= items.length) return;
+      
+      const item = items[state.tinderIndex];
+      const card = document.getElementById('tinder-card');
+      
+      if (direction === 'right') {
+        item.liked = true;
+        state.tinderHistory.push({ index: state.tinderIndex, liked: true });
+      } else {
+        item.archived = true;
+        state.tinderHistory.push({ index: state.tinderIndex, liked: false });
+      }
+      
+      card.style.transition = 'transform 0.3s, opacity 0.3s';
+      card.style.transform = `translateX(${direction === 'right' ? 500 : -500}px) rotate(${direction === 'right' ? 30 : -30}deg)`;
+      card.style.opacity = '0';
+      
+      setTimeout(() => {
+        state.tinderIndex++;
+        card.style.transition = 'none';
+        card.style.transform = '';
+        card.style.opacity = '';
+        card.querySelector('.tinder-stamp.like').classList.remove('show');
+        card.querySelector('.tinder-stamp.nope').classList.remove('show');
+        updateTinderCard();
+      }, 300);
+    }
+    
+    function tinderLike() { handleSwipe('right'); }
+    function tinderNope() { handleSwipe('left'); }
+    
+    function undoLast() {
+      if (state.tinderHistory.length === 0) { showToast('Nothing to undo'); return; }
+      const last = state.tinderHistory.pop();
+      state.tinderIndex = last.index;
+      const items = getFilteredItems();
+      if (items[last.index]) {
+        if (last.liked) { items[last.index].liked = false; items[last.index].archived = false; }
+        else { items[last.index].archived = false; }
       }
       updateTinderCard();
-      showToast('1つ戻したよ！');
+      showToast('Undone');
     }
-    function toggleLike(id){
-      const x=state.items.find(i=>i.id===id);
-      if(x){x.liked=!x.liked;render();}
+    
+    function toggleLike(id) {
+      const x = state.items.find(i => i.id === id);
+      if (x) { x.liked = !x.liked; render(); }
     }
-    function toggleArchive(id){
-      const x=state.items.find(i=>i.id===id);
-      if(x){x.archived=!x.archived;render();}
+    
+    function toggleArchive(id) {
+      const x = state.items.find(i => i.id === id);
+      if (x) { x.archived = !x.archived; render(); }
     }
-    function removeLike(id){
-      deleteTarget=id;
-      document.getElementById('confirm-title').textContent='Likeを削除しますか？';
-      document.getElementById('confirm-text').textContent='この操作は取り消せません';
-      document.getElementById('confirm-overlay').classList.add('on');
+    
+    function removeLike(id) {
+      deleteTarget = id;
+      document.getElementById('confirm-title').textContent = 'Remove from Collected?';
+      document.getElementById('confirm').classList.add('active');
     }
-    function restoreArchive(id){
-      const x=state.items.find(i=>i.id===id);
-      if(x){x.archived=false;renderArchive();showToast('アーカイブから復元したよ！');}
+    
+    function restoreArchive(id) {
+      const x = state.items.find(i => i.id === id);
+      if (x) { x.archived = false; renderArchive(); showToast('Restored'); }
     }
-    function showToast(msg){
-      const c=document.getElementById('toasts');
-      const t=document.createElement('div');
-      t.className='to';
-      t.textContent=msg;
+    
+    function showToast(msg) {
+      const c = document.getElementById('toasts');
+      const t = document.createElement('div');
+      t.className = 'toast';
+      t.textContent = msg;
       c.appendChild(t);
-      setTimeout(()=>t.remove(),3000);
+      setTimeout(() => t.remove(), 3000);
     }
-    function refreshAll(){showToast('更新したよ！','ok');}
-    function openSettings(){document.getElementById('settings-modal').classList.add('on');}
-    function closeSettings(){document.getElementById('settings-modal').classList.remove('on');}
-    function closeConfirm(){document.getElementById('confirm-overlay').classList.remove('on');deleteTarget=null;}
-    function confirmDelete(){
-      if(deleteTarget!==null){state.items=state.items.filter(x=>x.id!==deleteTarget);render();showToast('削除したよ！','ok');}
+    
+    function refreshAll() { showToast('Refreshed'); }
+    
+    function openSettings() { document.getElementById('settings-modal').classList.add('active'); }
+    function closeSettings() { document.getElementById('settings-modal').classList.remove('active'); }
+    function closeConfirm() { document.getElementById('confirm').classList.remove('active'); deleteTarget = null; }
+    
+    function confirmDelete() {
+      if (deleteTarget !== null) {
+        state.items = state.items.filter(x => x.id !== deleteTarget);
+        render();
+        showToast('Removed');
+      }
       closeConfirm();
     }
-    function updateDemoSource(){
-      state.demoSource=document.getElementById('demo-source').value;
+    
+    function updateDemoSource() {
+      state.demoSource = document.getElementById('demo-source').value;
       loadDemoData();
     }
+    
     // Swipe handling
-    const tc=document.getElementById('tinder-card');
-    let isD=false,sx=0,cx=0;
-    tc.addEventListener('mousedown',e=>{
-      if(state.tinderIndex>=getFilteredItems().length)return;
-      isD=true;sx=e.clientX;tc.style.transition='none';
+    const tc = document.getElementById('tinder-card');
+    let isDragging = false, startX = 0, currentX = 0;
+    
+    tc.addEventListener('mousedown', e => {
+      if (state.tinderIndex >= getFilteredItems().length) return;
+      isDragging = true;
+      startX = e.clientX;
+      tc.style.transition = 'none';
     });
-    document.addEventListener('mousemove',e=>{
-      if(!isD)return;
-      cx=e.clientX-sx;
-      const rot=cx*0.05;
-      tc.style.transform=`translateX(${cx}px) rotate(${rot}deg)`;
-      const sl=tc.querySelector('.tss.lk');
-      const sn=tc.querySelector('.tss.np');
-      if(cx>30){sl.classList.add('sh');sn.classList.remove('sh');}
-      else if(cx<-30){sn.classList.add('sh');sl.classList.remove('sh');}
-      else{sl.classList.remove('sh');sn.classList.remove('sh');}
+    
+    document.addEventListener('mousemove', e => {
+      if (!isDragging) return;
+      currentX = e.clientX - startX;
+      const rot = currentX * 0.05;
+      tc.style.transform = `translateX(${currentX}px) rotate(${rot}deg)`;
+      const sl = tc.querySelector('.tinder-stamp.like');
+      const sn = tc.querySelector('.tinder-stamp.nope');
+      if (currentX > 30) { sl.classList.add('show'); sn.classList.remove('show'); }
+      else if (currentX < -30) { sn.classList.add('show'); sl.classList.remove('show'); }
+      else { sl.classList.remove('show'); sn.classList.remove('show'); }
     });
-    document.addEventListener('mouseup',e=>{
-      if(!isD)return;
-      isD=false;
-      if(cx>80)tinderLike();else if(cx<-80)tinderNope();else{
-        tc.style.transition='transform 0.2s';
-        tc.style.transform='';
-        tc.querySelector('.tss.lk').classList.remove('sh');
-        tc.querySelector('.tss.np').classList.remove('sh');
+    
+    document.addEventListener('mouseup', e => {
+      if (!isDragging) return;
+      isDragging = false;
+      if (currentX > 80) tinderLike();
+      else if (currentX < -80) tinderNope();
+      else {
+        tc.style.transition = 'transform 0.2s';
+        tc.style.transform = '';
+        tc.querySelector('.tinder-stamp.like').classList.remove('show');
+        tc.querySelector('.tinder-stamp.nope').classList.remove('show');
       }
-      cx=0;
+      currentX = 0;
     });
-    tc.addEventListener('touchstart',e=>{
-      if(state.tinderIndex>=getFilteredItems().length)return;
-      isD=true;sx=e.touches[0].clientX;tc.style.transition='none';
+    
+    // Touch events
+    tc.addEventListener('touchstart', e => {
+      if (state.tinderIndex >= getFilteredItems().length) return;
+      isDragging = true;
+      startX = e.touches[0].clientX;
+      tc.style.transition = 'none';
     });
-    tc.addEventListener('touchmove',e=>{
-      if(!isD)return;
+    
+    tc.addEventListener('touchmove', e => {
+      if (!isDragging) return;
       e.preventDefault();
-      cx=e.touches[0].clientX-sx;
-      const rot=cx*0.05;
-      tc.style.transform=`translateX(${cx}px) rotate(${rot}deg)`;
-      const sl=tc.querySelector('.tss.lk');
-      const sn=tc.querySelector('.tss.np');
-      if(cx>30){sl.classList.add('sh');sn.classList.remove('sh');}
-      else if(cx<-30){sn.classList.add('sh');sl.classList.remove('sh');}
-      else{sl.classList.remove('sh');sn.classList.remove('sh');}
-    },{passive:false});
-    tc.addEventListener('touchend',e=>{
-      if(!isD)return;
-      isD=false;
-      if(cx>80)tinderLike();else if(cx<-80)tinderNope();else{
-        tc.style.transition='transform 0.2s';
-        tc.style.transform='';
-        tc.querySelector('.tss.lk').classList.remove('sh');
-        tc.querySelector('.tss.np').classList.remove('sh');
+      currentX = e.touches[0].clientX - startX;
+      const rot = currentX * 0.05;
+      tc.style.transform = `translateX(${currentX}px) rotate(${rot}deg)`;
+      const sl = tc.querySelector('.tinder-stamp.like');
+      const sn = tc.querySelector('.tinder-stamp.nope');
+      if (currentX > 30) { sl.classList.add('show'); sn.classList.remove('show'); }
+      else if (currentX < -30) { sn.classList.add('show'); sl.classList.remove('show'); }
+      else { sl.classList.remove('show'); sn.classList.remove('show'); }
+    }, { passive: false });
+    
+    tc.addEventListener('touchend', e => {
+      if (!isDragging) return;
+      isDragging = false;
+      if (currentX > 80) tinderLike();
+      else if (currentX < -80) tinderNope();
+      else {
+        tc.style.transition = 'transform 0.2s';
+        tc.style.transform = '';
+        tc.querySelector('.tinder-stamp.like').classList.remove('show');
+        tc.querySelector('.tinder-stamp.nope').classList.remove('show');
       }
-      cx=0;
+      currentX = 0;
     });
+    
     init();
   </script>
 </body>
