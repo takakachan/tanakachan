@@ -1317,8 +1317,13 @@ body.tinder-mode .toast-container {
     justify-content: space-around;
     align-items: center;
     z-index: 99999 !important;
-    transform: none !important;
-    transition: none !important;
+    transform: translateY(0) !important;
+    transition: transform 0.3s ease !important;
+  }
+  
+  /* Hidden state for Twitter-style scroll */
+  .mobile-nav.hidden {
+    transform: translateY(100%) !important;
   }
   
   /* In tinder mode, adjust main padding to above mobile nav */

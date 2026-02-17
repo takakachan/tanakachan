@@ -1163,5 +1163,40 @@ function setupTinderSwipe() {
   });
 }
 
+// Twitter-style mobile nav: hide on scroll down, show on scroll up
+(function() {
+  let lastScrollY = 0;
+  let ticking = false;
+  let hideTimeout = null;
+  const mobileNav = document.querySelector('.mobile-nav');
+  
+  if (!mobileNav) return;
+  
+  function updateNav(scrollY) {
+    const diff = scrollY - lastScrollY;
+    
+    // Scroll down - hide nav
+    if (diff > 10) {
+      clearTimeout(hideTimeout);
+      mobileNav.classList.add('hidden');
+    }
+    // Scroll up - show nav
+    else if (diff < -10) {
+      clearTimeout(hideTimeout);
+      mobileNav.classList.remove('hidden');
+    }
+    
+    lastScrollY = scrollY;
+    ticking = false;
+  }
+  
+  window.addEventListener('scroll', () => {
+    if (!ticking) {
+      window.requestAnimationFrame(() => updateNav(window.scrollY));
+      ticking = true;
+    }
+  }, { passive: true });
+})();
+
 // Start
 init();
