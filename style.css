@@ -158,7 +158,7 @@ header {
 
 .search-icon {
   position: absolute;
-  left: 8px;
+  left: 16px;
   top: 50%;
   transform: translateY(-50%);
   color: var(--text3);
