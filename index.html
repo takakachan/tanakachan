@@ -31,10 +31,6 @@
     </div>
   </header>
   <nav class="mobile-nav">
-    <button class="mobile-nav-btn" id="mobile-multi-select-btn" onclick="toggleMultiSelect()" title="Select multiple">
-      <span class="mobile-nav-icon"><svg viewBox="0 0 24 24" style="width:20px;height:20px;fill:currentColor"><path d="M3 5h2V3c-1.1 0-2 .9-2 2zm0 8h2v-2H3v2zm4 8h2v-2H7v2zM3 9h2V7H3v2zm10-6h-2v2h2V3zm6 0v2h2c0-1.1-.9-2-2-2zM5 21v-2H3c0 1.1.9 2 2 2zm-2-4h2v-2H3v2zM9 3H7v2h2V3zm2 18h2v-2h-2v2zm8-8h2v-2h-2v2zm0 8c1.1 0 2-.9 2-2h-2v2zm0-12h2V7h-2v2zm0 8h2v-2h-2v2zm-4 4h2v-2h-2v2zm0-16h2V3h-2v2z"/></svg></span>
-      <span>Select</span>
-    </button>
     <button class="mobile-nav-btn active" data-mode="grid" onclick="setMode('grid')">
       <span class="mobile-nav-icon"><svg viewBox="0 0 24 24" style="width:20px;height:20px;fill:currentColor"><path d="M3 3v8h8V3H3zm6 6H5V5h4v4zm-6 4v8h8v-8H3zm6 6H5v-4h4v4zm4-16v8h8V3h-8zm6 6h-4V5h4v4zm-6 4v8h8v-8h-8zm6 6h-4v-4h4v4z"/></svg></span>
       <span>Explorer</span>
@@ -55,17 +51,17 @@
   <main>
     <div id="grid-view">
       <div class="filter-bar">
-        <select class="sort-select" id="sort-select" onchange="handleSort(this.value)">
-          <option value="newest">Newest</option>
-          <option value="oldest">Oldest</option>
-          <option value="title">Title A-Z</option>
-        </select>
+        <button class="multi-select-toggle" id="multi-select-toggle" onclick="toggleMultiSelect()"><svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:currentColor;margin-right:6px"><path d="M3 5h2V3c-1.1 0-2 .9-2 2zm0 8h2v-2H3v2zm4 8h2v-2H7v2zM3 9h2V7H3v2zm10-6h-2v2h2V3zm6 0v2h2c0-1.1-.9-2-2-2zM5 21v-2H3c0 1.1.9 2 2 2zm-2-4h2v-2H3v2zM9 3H7v2h2V3zm2 18h2v-2h-2v2zm8-8h2v-2h-2v2zm0 8c1.1 0 2-.9 2-2h-2v2zm0-12h2V7h-2v2zm0 8h2v-2h-2v2zm-4 4h2v-2h-2v2zm0-16h2V3h-2v2z"/></svg> Select</button>
         <div class="size-selector">
           <button class="size-btn active" onclick="setCardSize('small')" title="Small (minimal)">S</button>
           <button class="size-btn" onclick="setCardSize('medium')" title="Medium (2 cols)">M</button>
           <button class="size-btn" onclick="setCardSize('large')" title="Large (1 col)">L</button>
         </div>
-        <button class="multi-select-toggle" id="multi-select-toggle" onclick="toggleMultiSelect()"><svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:currentColor;margin-right:6px"><path d="M3 5h2V3c-1.1 0-2 .9-2 2zm0 8h2v-2H3v2zm4 8h2v-2H7v2zM3 9h2V7H3v2zm10-6h-2v2h2V3zm6 0v2h2c0-1.1-.9-2-2-2zM5 21v-2H3c0 1.1.9 2 2 2zm-2-4h2v-2H3v2zM9 3H7v2h2V3zm2 18h2v-2h-2v2zm8-8h2v-2h-2v2zm0 8c1.1 0 2-.9 2-2h-2v2zm0-12h2V7h-2v2zm0 8h2v-2h-2v2zm-4 4h2v-2h-2v2zm0-16h2V3h-2v2z"/></svg> Select</button>
+        <select class="sort-select" id="sort-select" onchange="handleSort(this.value)">
+          <option value="newest">Newest</option>
+          <option value="oldest">Oldest</option>
+          <option value="title">Title A-Z</option>
+        </select>
       </div>
       <div class="stats-bar">
         <div class="stat"><span class="stat-num" id="total-count">0</span><span class="stat-label">Total</span></div>
