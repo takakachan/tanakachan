@@ -142,7 +142,7 @@ header {
 
 .search-input {
   width: 100%;
-  padding: 8px 28px 8px 28px;
+  padding: 8px 28px 8px 32px;
   border-radius: var(--card-radius);
   border: 1px solid var(--border);
   background: var(--bg2);
@@ -676,10 +676,20 @@ main {
   column-width: auto;
 }
 
+.card-size-m .card {
+  width: 100%;
+  max-width: 280px;
+}
+
 /* Card Size - L (1 column) */
 .card-size-l .masonry {
   column-count: 1;
   column-width: auto;
+}
+
+.card-size-l .card {
+  width: 100%;
+  max-width: 400px;
 }
 
 /* Auto size for PC */
@@ -1368,10 +1378,9 @@ body.tinder-mode .toast-container {
     font-size: 0.6rem;
     cursor: pointer;
     transition: background 0.15s ease, color 0.15s ease;
-    padding: 8px;
-    border-radius: 8px;
-    position: relative;
+    padding: 8px 4px;
     overflow: hidden;
+    border-radius: 8px 8px 0 0;
   }
   
   .mobile-nav-btn:active {

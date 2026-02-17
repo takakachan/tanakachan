@@ -960,8 +960,8 @@ function handleSwipe(direction) {
     saveNopeTimestamps();
   }
 
-  card.style.transition = 'transform 0.3s, opacity 0.3s';
-  card.style.transform = `translateX(${direction === 'right' ? 500 : -500}px) rotate(${direction === 'right' ? 30 : -30}deg)`;
+  card.style.transition = 'transform 0.4s, opacity 0.4s';
+  card.style.transform = `translateX(${direction === 'right' ? 500 : -500}px) rotate(${direction === 'right' ? 90 : -90}deg)`;
   card.style.opacity = '0';
 
   setTimeout(() => {
@@ -977,10 +977,16 @@ function handleSwipe(direction) {
 
 function tinderLike() {
   handleSwipe('right');
+  // Remove pressed class to return to default color
+  const likeBtn = document.querySelector('.tinder-btn.like');
+  if (likeBtn) likeBtn.classList.remove('pressed');
 }
 
 function tinderNope() {
   handleSwipe('left');
+  // Remove pressed class to return to default color
+  const nopeBtn = document.querySelector('.tinder-btn.nope');
+  if (nopeBtn) nopeBtn.classList.remove('pressed');
 }
 
 function undoLast() {
