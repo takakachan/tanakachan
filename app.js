@@ -14,7 +14,8 @@ let state = {
   demoSource: 'tech',
   searchQuery: '',
   sortBy: 'newest',
-  rssFeeds: []
+  rssFeeds: [],
+  nopeTimestamps: {}
 };
 
 let deleteTarget = null;
@@ -31,6 +32,52 @@ function loadRssFeeds() {
     console.error('Error loading RSS feeds:', e);
   }
   renderRssFeedsList();
+}
+
+// Load nope timestamps from localStorage
+function loadNopeTimestamps() {
+  try {
+    const saved = localStorage.getItem('mediaPulseNopeTimestamps');
+    if (saved) {
+      state.nopeTimestamps = JSON.parse(saved);
+    }
+  } catch (e) {
+    console.error('Error loading nope timestamps:', e);
+  }
+  // Clean up nope items older than 24 hours
+  cleanupOldNopeItems();
+}
+
+// Save nope timestamps to localStorage
+function saveNopeTimestamps() {
+  try {
+    localStorage.setItem('mediaPulseNopeTimestamps', JSON.stringify(state.nopeTimestamps));
+  } catch (e) {
+    console.error('Error saving nope timestamps:', e);
+  }
+}
+
+// Clean up nope items older than 24 hours
+function cleanupOldNopeItems() {
+  const now = Date.now();
+  const twentyFourHours = 24 * 60 * 60 * 1000;
+  let cleanedCount = 0;
+  
+  Object.keys(state.nopeTimestamps).forEach(id => {
+    if (now - state.nopeTimestamps[id] > twentyFourHours) {
+      const item = state.items.find(i => i.id == id);
+      if (item && item.nope) {
+        item.nope = false;
+        cleanedCount++;
+      }
+      delete state.nopeTimestamps[id];
+    }
+  });
+  
+  if (cleanedCount > 0) {
+    saveNopeTimestamps();
+    console.log('Cleaned up ' + cleanedCount + ' nope items older than 24 hours');
+  }
 }
 
 // Save RSS feeds to localStorage
@@ -226,6 +273,7 @@ const icons = {
 // Initialize
 function init() {
   loadRssFeeds();
+  loadNopeTimestamps();
   loadCardSize();
   loadDemoData();
   setupEvents();
@@ -483,8 +531,11 @@ function batchNope() {
     if (item) {
       item.nope = true;
       item.liked = false;
+      // Add nope timestamp
+      state.nopeTimestamps[id] = Date.now();
     }
   });
+  saveNopeTimestamps();
   
   showToast('Added ' + state.selectedItems.size + ' items to Nope');
   state.selectedItems.clear();
@@ -788,10 +839,18 @@ function handleSwipe(direction) {
     item.liked = true;
     item.nope = false;
     state.tinderHistory.push({ index: state.tinderIndex, liked: true });
+    // Remove nope timestamp if exists
+    if (state.nopeTimestamps[item.id]) {
+      delete state.nopeTimestamps[item.id];
+      saveNopeTimestamps();
+    }
   } else {
     item.nope = true;
     item.liked = false;
     state.tinderHistory.push({ index: state.tinderIndex, liked: false });
+    // Add nope timestamp
+    state.nopeTimestamps[item.id] = Date.now();
+    saveNopeTimestamps();
   }
 
   card.style.transition = 'transform 0.3s, opacity 0.3s';
@@ -809,8 +868,23 @@ function handleSwipe(direction) {
   }, 300);
 }
 
-function tinderLike() { handleSwipe('right'); }
-function tinderNope() { handleSwipe('left'); }
+function tinderLike() {
+  const btn = document.querySelector('.tinder-btn.like');
+  if (btn) {
+    btn.classList.add('pressed');
+    setTimeout(() => btn.classList.remove('pressed'), 300);
+  }
+  handleSwipe('right');
+}
+
+function tinderNope() {
+  const btn = document.querySelector('.tinder-btn.nope');
+  if (btn) {
+    btn.classList.add('pressed');
+    setTimeout(() => btn.classList.remove('pressed'), 300);
+  }
+  handleSwipe('left');
+}
 
 function undoLast() {
   if (state.tinderHistory.length === 0) { showToast('Nothing to undo'); return; }
@@ -852,8 +926,20 @@ function toggleLike(id) {
 function toggleNope(id) {
   const x = state.items.find(i => i.id === id);
   if (x) {
+    const wasNoping = x.nope;
     x.nope = !x.nope;
-    if (x.nope) x.liked = false;
+    if (x.nope) {
+      x.liked = false;
+      // Add nope timestamp
+      state.nopeTimestamps[id] = Date.now();
+      saveNopeTimestamps();
+    } else {
+      // Remove nope timestamp
+      if (state.nopeTimestamps[id]) {
+        delete state.nopeTimestamps[id];
+        saveNopeTimestamps();
+      }
+    }
     render();
     if (state.currentMode === 'nope') {
       renderNope();
@@ -884,8 +970,16 @@ function showToast(msg) {
   setTimeout(() => t.remove(), 3000);
 }
 
-// Refresh
+// Refresh with button color animation
 function refreshAll() {
+  const btn = document.querySelector('.action-btn[onclick="refreshAll()"]');
+  if (btn) {
+    const originalColor = btn.style.color;
+    btn.style.color = 'var(--accent)';
+    setTimeout(() => {
+      btn.style.color = originalColor;
+    }, 300);
+  }
   loadDemoData();
   showToast('Refreshed');
 }
