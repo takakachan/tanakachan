@@ -445,8 +445,7 @@ main {
   display: block;
 }
 
-/* Show checkbox on hover or in multi-select mode */
-.card:hover .card-checkbox,
+/* Show checkbox only in multi-select mode */
 .multi-select-mode .card-checkbox {
   opacity: 1;
 }
