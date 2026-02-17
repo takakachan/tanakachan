@@ -144,9 +144,6 @@ header {
   overflow: visible; 
   transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1); 
   flex-shrink: 0; 
-  display: flex;
-  align-items: center;
-  gap: 8px;
 }
 
 .search-input {
@@ -167,17 +164,34 @@ header {
 .search-input::placeholder { color: var(--text3); }
 
 .search-icon {
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
   color: var(--text3);
   font-size: 0.75rem;
   pointer-events: none;
-  display: flex;
-  align-items: center;
-  flex-shrink: 0;
+  z-index: 1;
 }
-  height: 16px;
+
+.search-input {
+  width: 100%;
+  padding: 8px 28px 8px 32px;
+  border-radius: var(--card-radius);
+  border: 1px solid var(--border);
+  background: var(--bg2);
+  color: var(--text);
+  font-size: 0.8rem;
+  outline: none;
+  transition: var(--transition);
+  line-height: 1.2;
 }
 
 .search-clear {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
   background: none;
   border: none;
   color: var(--text3);
@@ -185,7 +199,6 @@ header {
   font-size: 0.8rem;
   padding: 4px 6px;
   display: none;
-  flex-shrink: 0;
 }
 
 .search-clear.visible { display: block; }
@@ -1213,16 +1226,15 @@ body.tinder-mode .toast-container {
     border: 1px solid var(--border);
     border-radius: 12px;
     box-shadow: 0 8px 32px rgba(0,0,0,0.4);
-    display: flex;
-    align-items: center;
-    gap: 8px;
+    display: none;
     z-index: 200;
     margin-top: 8px;
   }
   
-  .search-box.active { display: flex; }
-  .search-input { width: 100%; background: var(--bg); flex: 1; }
+  .search-box.active { display: block; }
+  .search-input { width: 100%; background: var(--bg); padding-left: 36px; padding-right: 28px; }
   .search-input:focus { width: 100%; }
+  .search-icon { left: 16px; font-size: 0.85rem; }
   
   /* Remove padding adjustment - search is now floating overlay */
   .search-box.active ~ main,
