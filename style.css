@@ -244,13 +244,21 @@ main {
 
 .sort-select {
   margin-left: auto;
-  padding: 8px 0;
+  padding: 8px 20px 8px 0;
   border: none;
   background: transparent;
   color: var(--text2);
   font-size: 0.75rem;
   cursor: pointer;
   outline: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='%23a0a0a0'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 4px center;
+}
+
+.sort-select:hover {
+  color: var(--text);
 }
 
 .view-toggle {
@@ -556,7 +564,7 @@ main {
 
 /* Multi-select Toggle Button */
 .multi-select-toggle {
-  margin-left: 12px;
+  margin-right: auto;
   padding: 8px 12px;
   border: 1px solid var(--border);
   background: transparent;
@@ -658,8 +666,7 @@ main {
   display: none;
   flex-direction: column;
   align-items: center;
-  padding: 12px 16px;
-  padding-top: 8px;
+  padding: 4px 16px 12px;
 }
 
 .tinder-view.active { display: flex; }
