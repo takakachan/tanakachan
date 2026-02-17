@@ -1002,7 +1002,7 @@ body.tinder-mode .toast-container {
 /* Toast */
 .toast-container {
   position: fixed;
-  top: 70px;
+  bottom: 80px;
   right: 20px;
   z-index: 300;
   display: flex;
@@ -1177,7 +1177,7 @@ body.tinder-mode .toast-container {
   
   /* Tinder mode toast on mobile */
   body.tinder-mode .toast-container {
-    bottom: 140px;
+    bottom: 90px;
     right: 10px;
   }
   
