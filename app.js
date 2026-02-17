@@ -13,11 +13,157 @@ let state = {
   tinderHistory: [],
   demoSource: 'tech',
   searchQuery: '',
-  sortBy: 'newest'
+  sortBy: 'newest',
+  rssFeeds: []
 };
 
 let deleteTarget = null;
 let deleteType = null;
+
+// Load RSS feeds from localStorage
+function loadRssFeeds() {
+  try {
+    const saved = localStorage.getItem('mediaPulseRssFeeds');
+    if (saved) {
+      state.rssFeeds = JSON.parse(saved);
+    }
+  } catch (e) {
+    console.error('Error loading RSS feeds:', e);
+  }
+  renderRssFeedsList();
+}
+
+// Save RSS feeds to localStorage
+function saveRssFeeds() {
+  try {
+    localStorage.setItem('mediaPulseRssFeeds', JSON.stringify(state.rssFeeds));
+  } catch (e) {
+    console.error('Error saving RSS feeds:', e);
+  }
+}
+
+// Add RSS Feed
+function addRssFeed() {
+  const urlInput = document.getElementById('rss-url');
+  const genreInput = document.getElementById('rss-genre');
+  const url = urlInput.value.trim();
+  const genre = genreInput.value.trim() || 'RSS';
+  
+  if (!url) {
+    showToast('Please enter an RSS URL');
+    return;
+  }
+  
+  // Basic URL validation
+  try {
+    new URL(url);
+  } catch (e) {
+    showToast('Please enter a valid URL');
+    return;
+  }
+  
+  // Check for duplicates
+  if (state.rssFeeds.some(f => f.url === url)) {
+    showToast('This RSS feed is already registered');
+    return;
+  }
+  
+  state.rssFeeds.push({
+    url: url,
+    genre: genre,
+    id: Date.now()
+  });
+  
+  saveRssFeeds();
+  renderRssFeedsList();
+  urlInput.value = '';
+  genreInput.value = '';
+  showToast('RSS feed added: ' + genre);
+}
+
+// Remove RSS Feed
+function removeRssFeed(id) {
+  state.rssFeeds = state.rssFeeds.filter(f => f.id !== id);
+  saveRssFeeds();
+  renderRssFeedsList();
+  showToast('RSS feed removed');
+}
+
+// Render RSS feeds list
+function renderRssFeedsList() {
+  const container = document.getElementById('rss-feeds-list');
+  if (!container) return;
+  
+  if (state.rssFeeds.length === 0) {
+    container.innerHTML = '<div style="color:var(--text3);font-size:0.8rem;padding:8px 0;">No RSS feeds registered</div>';
+    return;
+  }
+  
+  container.innerHTML = state.rssFeeds.map(feed => `
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:8px;background:var(--bg2);border-radius:4px;margin-bottom:6px;">
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:0.75rem;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${feed.genre}</div>
+        <div style="font-size:0.65rem;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${feed.url}</div>
+      </div>
+      <button onclick="removeRssFeed(${feed.id})" style="background:none;border:none;color:var(--text3);cursor:pointer;padding:4px 8px;fontrem;">×-size:1</button>
+    </div>
+  `).join('');
+}
+
+// Fetch RSS feed using a CORS proxy
+async function fetchRssFeed(feed) {
+  // Using rss2json API as a proxy to avoid CORS issues
+  const proxyUrl = 'https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(feed.url);
+  
+  try {
+    const response = await fetch(proxyUrl);
+    const data = await response.json();
+    
+    if (data.status !== 'ok' || !data.items) {
+      console.error('Error fetching RSS:', data);
+      return [];
+    }
+    
+    return data.items.map((item, index) => ({
+      id: feed.id + '_' + index,
+      type: feed.genre.toLowerCase(),
+      title: item.title,
+      source: feed.genre,
+      thumbnail: item.thumbnail || item.enclosure?.link || '',
+      date: item.pubDate ? item.pubDate.split(' ')[0] : new Date().toISOString().split('T')[0],
+      url: item.link,
+      liked: false,
+      nope: false
+    }));
+  } catch (error) {
+    console.error('Error fetching RSS feed:', feed.url, error);
+    return [];
+  }
+}
+
+// Fetch all RSS feeds
+async function fetchAllRss() {
+  if (state.rssFeeds.length === 0) {
+    showToast('No RSS feeds registered');
+    return;
+  }
+  
+  showToast('Fetching RSS feeds...');
+  
+  const allItems = [];
+  for (const feed of state.rssFeeds) {
+    const items = await fetchRssFeed(feed);
+    allItems.push(...items);
+  }
+  
+  if (allItems.length > 0) {
+    state.items = allItems;
+    render();
+    showToast('Loaded ' + allItems.length + ' items from RSS feeds');
+  } else {
+    showToast('No items found from RSS feeds');
+  }
+}
 
 // Demo Data
 const demoData = {
@@ -79,6 +225,7 @@ const icons = {
 
 // Initialize
 function init() {
+  loadRssFeeds();
   loadDemoData();
   setupEvents();
   setupKeyboard();

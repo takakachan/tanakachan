@@ -156,6 +156,18 @@
         <button class="modal-close" onclick="closeSettings()"><svg viewBox="0 0 24 24" style="width:20px;height:20px;fill:currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></button>
       </div>
       <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Add RSS Feed</label>
+          <input type="text" class="form-input" id="rss-url" placeholder="RSS URL (e.g., https://example.com/feed.xml)" style="width:100%;padding:10px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:0.85rem;margin-bottom:8px;">
+          <input type="text" class="form-input" id="rss-genre" placeholder="Genre (e.g., Blog, Podcast, YouTube, Tech, News)" style="width:100%;padding:10px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:0.85rem;margin-bottom:8px;">
+          <button class="btn" onclick="addRssFeed()" style="margin-bottom:16px;">Add RSS Feed</button>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Registered RSS Feeds</label>
+          <div id="rss-feeds-list" style="max-height:150px;overflow-y:auto;margin-bottom:16px;"></div>
+        </div>
+        <button class="btn" onclick="fetchAllRss()" style="background:var(--bg3);border-color:var(--border);">Fetch All RSS Feeds</button>
+        <hr style="border:none;border-top:1px solid var(--border);margin:20px 0;">
         <div class="demo-badge">
           <span>●</span> Demo Mode Active
         </div>
