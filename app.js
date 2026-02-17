@@ -798,9 +798,54 @@ function updateStats() {
 
 // Tinder Functions
 function initTinder() {
+  // Restore card structure if it was replaced by completion screen
+  const card = document.getElementById('tinder-card');
+  if (!card.querySelector('.tinder-stamp')) {
+    card.innerHTML = `
+      <div class="tinder-stamp like">LIKE</div>
+      <div class="tinder-stamp nope">NOPE</div>
+      <img class="tinder-img" id="tinder-img" src="" alt="">
+      <div class="tinder-content">
+        <div class="tinder-type" id="tinder-type"></div>
+        <div class="tinder-title" id="tinder-title"></div>
+        <div class="tinder-source" id="tinder-source"></div>
+      </div>
+    `;
+  }
   state.tinderIndex = 0;
   state.tinderHistory = [];
+  setupTinderButtonEvents();
   updateTinderCard();
+}
+
+function setupTinderButtonEvents() {
+  // Like button
+  const likeBtn = document.querySelector('.tinder-btn.like');
+  if (likeBtn) {
+    likeBtn.onmousedown = () => likeBtn.classList.add('pressed');
+    likeBtn.onmouseup = () => likeBtn.classList.remove('pressed');
+    likeBtn.onmouseleave = () => likeBtn.classList.remove('pressed');
+    likeBtn.ontouchstart = (e) => { e.preventDefault(); likeBtn.classList.add('pressed'); };
+    likeBtn.ontouchend = () => likeBtn.classList.remove('pressed');
+  }
+  // Nope button
+  const nopeBtn = document.querySelector('.tinder-btn.nope');
+  if (nopeBtn) {
+    nopeBtn.onmousedown = () => nopeBtn.classList.add('pressed');
+    nopeBtn.onmouseup = () => nopeBtn.classList.remove('pressed');
+    nopeBtn.onmouseleave = () => nopeBtn.classList.remove('pressed');
+    nopeBtn.ontouchstart = (e) => { e.preventDefault(); nopeBtn.classList.add('pressed'); };
+    nopeBtn.ontouchend = () => nopeBtn.classList.remove('pressed');
+  }
+  // Undo button
+  const undoBtn = document.querySelector('.tinder-btn.undo');
+  if (undoBtn) {
+    undoBtn.onmousedown = () => undoBtn.classList.add('pressed');
+    undoBtn.onmouseup = () => undoBtn.classList.remove('pressed');
+    undoBtn.onmouseleave = () => undoBtn.classList.remove('pressed');
+    undoBtn.ontouchstart = (e) => { e.preventDefault(); undoBtn.classList.add('pressed'); };
+    undoBtn.ontouchend = () => undoBtn.classList.remove('pressed');
+  }
 }
 
 function updateTinderCard() {
@@ -815,22 +860,44 @@ function updateTinderCard() {
   sn.classList.remove('show');
 
   if (state.tinderIndex >= items.length) {
-    document.getElementById('tinder-img').src = '';
-    document.getElementById('tinder-img').classList.add('empty');
+    const card = document.getElementById('tinder-card');
+    const img = document.getElementById('tinder-img');
+    img.src = '';
+    img.classList.add('empty');
+    img.style.display = 'none';
     document.getElementById('tinder-type').textContent = '';
-    let tinderEmptyTitle = 'All caught up!';
-    let tinderEmptyHint = 'Load more demo data or switch categories to continue';
+    
+    let tinderEmptyTitle = '🎉 All Done! 🎉';
+    let tinderEmptyHint = 'Great job! You\'ve reviewed all content. Load more data or change filters to continue.';
     if (state.filter !== 'all') {
-      tinderEmptyTitle = 'No more ' + state.filter + ' content';
-      tinderEmptyHint = 'Try a different category or click "All" in the filter bar';
+      tinderEmptyTitle = '🎉 ' + state.filter.charAt(0).toUpperCase() + state.filter.slice(1) + ' Complete! 🎉';
+      tinderEmptyHint = 'Try another category or switch to "All" to see more content';
     } else if (state.searchQuery) {
-      tinderEmptyTitle = 'No more results';
-      tinderEmptyHint = 'Clear your search to see all content';
+      tinderEmptyTitle = '🎉 Search Complete! 🎉';
+      tinderEmptyHint = 'Clear search to review all content';
     }
-    document.getElementById('tinder-title').textContent = tinderEmptyTitle;
-    document.getElementById('tinder-source').textContent = tinderEmptyHint;
+    
+    // Create a celebration container
+    card.innerHTML = `
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:40px;text-align:center;background:linear-gradient(135deg, var(--bg2) 0%, var(--bg3) 100%);">
+        <div style="font-size:4rem;margin-bottom:16px;animation:celebrate 0.8s ease-out;">🏆</div>
+        <div style="font-size:1.5rem;font-weight:600;color:var(--text);margin-bottom:8px;">${tinderEmptyTitle}</div>
+        <div style="font-size:0.9rem;color:var(--text2);margin-bottom:24px;max-width:250px;line-height:1.5;">${tinderEmptyHint}</div>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;">
+          <button onclick="loadDemoData();initTinder();" style="padding:12px 24px;background:var(--accent);color:white;border:none;border-radius:25px;font-size:0.85rem;font-weight:500;cursor:pointer;transition:transform 0.2s;">
+            🔄 Load More
+          </button>
+          <button onclick="setMode('grid')" style="padding:12px 24px;background:transparent;color:var(--text2);border:1px solid var(--border);border-radius:25px;font-size:0.85rem;cursor:pointer;transition:background 0.2s;">
+            📋 View All
+          </button>
+        </div>
+      </div>
+    `;
+    card.style.animation = 'celebrate 0.6s ease-out';
+    setTimeout(() => { card.style.animation = ''; }, 600);
+    
     document.getElementById('tinder-progress-fill').style.width = '100%';
-    document.getElementById('tinder-progress-text').textContent = 'Complete!';
+    document.getElementById('tinder-progress-text').textContent = '✨ Complete! ✨';
     return;
   }
 

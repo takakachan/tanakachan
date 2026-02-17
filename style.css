@@ -142,7 +142,7 @@ header {
 
 .search-input {
   width: 100%;
-  padding: 8px 12px 8px 34px;
+  padding: 8px 28px 8px 28px;
   border-radius: var(--card-radius);
   border: 1px solid var(--border);
   background: var(--bg2);
@@ -158,12 +158,13 @@ header {
 
 .search-icon {
   position: absolute;
-  left: 12px;
+  left: 10px;
   top: 50%;
   transform: translateY(-50%);
   color: var(--text3);
   font-size: 0.85rem;
   pointer-events: none;
+  z-index: 1;
 }
 
 .search-clear {
@@ -220,12 +221,27 @@ main {
 /* Filter Bar */
 .filter-bar {
   display: flex;
-  gap: 0;
+  gap: 12px;
   margin-bottom: 24px;
   flex-wrap: wrap;
   align-items: center;
+  justify-content: space-between;
   border-bottom: 1px solid var(--border);
   padding-bottom: 0;
+}
+
+.filter-bar-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.filter-bar-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-left: auto;
 }
 
 .filter-btn {
@@ -687,6 +703,11 @@ body.tinder-mode {
   height: 100%;
 }
 
+/* Mobile nav should always be visible in tinder mode */
+body.tinder-mode .mobile-nav {
+  transform: translateY(0);
+}
+
 /* Tinder progress bar */
 .tinder-progress-wrap {
   width: 100%;
@@ -836,30 +857,41 @@ body.tinder-mode .toast-container {
   color: var(--text2);
   cursor: pointer;
   font-size: 1.2rem;
-  transition: var(--transition);
+  transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease, transform 0.1s ease;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 0;
 }
 
+.tinder-btn.pressed {
+  transition: none;
+}
+
 .tinder-btn:hover { transform: scale(1.1); border-color: var(--text2); }
 .tinder-btn.nope:hover { border-color: #a78bfa; color: #a78bfa; }
 .tinder-btn.undo:hover { border-color: #fbbf24; color: #fbbf24; }
 .tinder-btn.like:hover { border-color: var(--accent); color: var(--accent); }
-.tinder-btn.nope.pressed { background: #a78bfa; border-color: #a78bfa; color: white; }
-.tinder-btn.undo.pressed { background: #fbbf24; border-color: #fbbf24; color: #1a1a1a; }
 
 .tinder-btn.nope.pressed {
   background: #a78bfa;
   border-color: #a78bfa;
   color: white;
+  transition: none;
 }
 
 .tinder-btn.undo.pressed {
   background: #fbbf24;
   border-color: #fbbf24;
   color: #1a1a1a;
+  transition: none;
+}
+
+.tinder-btn.like.pressed {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+  transition: none;
 }
 
 /* Tinder like button heart color animation */
@@ -880,6 +912,10 @@ body.tinder-mode .toast-container {
 
 .tinder-btn.like.pressed svg {
   fill: white;
+}
+
+.tinder-btn:not(.like).pressed svg {
+  fill: currentColor;
 }
 
 .tinder-btn svg {
@@ -1265,6 +1301,7 @@ body.tinder-mode .toast-container {
 .mobile-nav { display: none; }
 
 @media (max-width: 768px) {
+  /* Mobile nav always visible */
   .mobile-nav {
     display: flex;
     position: fixed;
@@ -1281,6 +1318,15 @@ body.tinder-mode .toast-container {
     padding-bottom: calc(8px + env(safe-area-inset-bottom));
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     transform: translateY(0);
+  }
+  
+  /* In tinder mode, adjust main padding to above mobile nav */
+  body.tinder-mode main {
+    padding-bottom: 80px;
+  }
+  
+  body.tinder-mode .tinder-view {
+    padding-bottom: 20px;
   }
   
   .mobile-nav-btn {
@@ -1345,6 +1391,14 @@ body.tinder-mode .toast-container {
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes celebrate {
+  0% { transform: scale(1) rotate(0deg); }
+  25% { transform: scale(1.1) rotate(-3deg); }
+  50% { transform: scale(1.1) rotate(3deg); }
+  75% { transform: scale(1.05) rotate(-1deg); }
+  100% { transform: scale(1) rotate(0deg); }
 }
 
 .card { animation: fadeIn 0.3s ease backwards; }
