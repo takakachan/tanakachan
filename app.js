@@ -867,28 +867,29 @@ function updateTinderCard() {
     img.style.display = 'none';
     document.getElementById('tinder-type').textContent = '';
     
-    let tinderEmptyTitle = '🎉 All Done! 🎉';
-    let tinderEmptyHint = 'Great job! You\'ve reviewed all content. Load more data or change filters to continue.';
+    let tinderEmptyTitle = '🎉 全て終えた！ 🎉';
+    let tinderEmptyHint = 'お疲れ様でした！すべてのコンテンツをチェックしました。データを更新するかフィルターを変更して続けましょう。';
     if (state.filter !== 'all') {
-      tinderEmptyTitle = '🎉 ' + state.filter.charAt(0).toUpperCase() + state.filter.slice(1) + ' Complete! 🎉';
-      tinderEmptyHint = 'Try another category or switch to "All" to see more content';
+      tinderEmptyTitle = '🎉 ' + state.filter.charAt(0).toUpperCase() + state.filter.slice(1) + ' 完了！ 🎉';
+      tinderEmptyHint = '別のカテゴリを試すか、「すべて」をクリックして更多の内容を見る';
     } else if (state.searchQuery) {
-      tinderEmptyTitle = '🎉 Search Complete! 🎉';
-      tinderEmptyHint = 'Clear search to review all content';
+      tinderEmptyTitle = '🎉 検索完了！ 🎉';
+      tinderEmptyHint = '検索をクリアしてすべてのコンテンツを見る';
     }
     
     // Create a celebration container
     card.innerHTML = `
-      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:40px;text-align:center;background:linear-gradient(135deg, var(--bg2) 0%, var(--bg3) 100%);">
-        <div style="font-size:4rem;margin-bottom:16px;animation:celebrate 0.8s ease-out;">🏆</div>
-        <div style="font-size:1.5rem;font-weight:600;color:var(--text);margin-bottom:8px;">${tinderEmptyTitle}</div>
-        <div style="font-size:0.9rem;color:var(--text2);margin-bottom:24px;max-width:250px;line-height:1.5;">${tinderEmptyHint}</div>
-        <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;">
-          <button onclick="loadDemoData();initTinder();" style="padding:12px 24px;background:var(--accent);color:white;border:none;border-radius:25px;font-size:0.85rem;font-weight:500;cursor:pointer;transition:transform 0.2s;">
-            🔄 Load More
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:40px;text-align:center;background:linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);">
+        <div style="font-size:5rem;margin-bottom:20px;animation:celebrate 0.8s ease-out;filter:drop-shadow(0 0 20px rgba(248, 114, 124, 0.5));">🎉</div>
+        <div style="font-size:1.8rem;font-weight:700;color:#fff;margin-bottom:12px;text-shadow:0 2px 10px rgba(0,0,0,0.3);">全て終えた！</div>
+        <div style="font-size:1rem;font-weight:500;color:#f8727c;margin-bottom:16px;">Amazing Work! ✨</div>
+        <div style="font-size:0.9rem;color:rgba(255,255,255,0.7);margin-bottom:28px;max-width:260px;line-height:1.6;">${tinderEmptyHint}</div>
+        <div style="display:flex;gap:14px;flex-wrap:wrap;justify-content:center;">
+          <button onclick="loadDemoData();initTinder();" style="padding:14px 28px;background:linear-gradient(135deg, #f8727c 0%, #fb98a8 100%);color:white;border:none;border-radius:30px;font-size:0.9rem;font-weight:600;cursor:pointer;transition:all 0.2s;box-shadow:0 4px 15px rgba(248, 114, 124, 0.4);">
+            🔄 もう一度
           </button>
-          <button onclick="setMode('grid')" style="padding:12px 24px;background:transparent;color:var(--text2);border:1px solid var(--border);border-radius:25px;font-size:0.85rem;cursor:pointer;transition:background 0.2s;">
-            📋 View All
+          <button onclick="setMode('grid')" style="padding:14px 28px;background:rgba(255,255,255,0.1);color:#fff;border:1px solid rgba(255,255,255,0.2);border-radius:30px;font-size:0.9rem;cursor:pointer;transition:background 0.2s;">
+            📋 すべて見る
           </button>
         </div>
       </div>
@@ -897,7 +898,7 @@ function updateTinderCard() {
     setTimeout(() => { card.style.animation = ''; }, 600);
     
     document.getElementById('tinder-progress-fill').style.width = '100%';
-    document.getElementById('tinder-progress-text').textContent = '✨ Complete! ✨';
+    document.getElementById('tinder-progress-text').textContent = '✨ 完了！ ✨';
     return;
   }
 
@@ -933,17 +934,6 @@ function handleSwipe(direction) {
   const item = items[state.tinderIndex];
   const card = document.getElementById('tinder-card');
 
-  // Button press animation - change color then revert
-  if (direction === 'right') {
-    const likeBtn = document.querySelector('.tinder-btn.like');
-    likeBtn.classList.add('pressed');
-    setTimeout(() => likeBtn.classList.remove('pressed'), 300);
-  } else {
-    const nopeBtn = document.querySelector('.tinder-btn.nope');
-    nopeBtn.classList.add('pressed');
-    setTimeout(() => nopeBtn.classList.remove('pressed'), 300);
-  }
-
   if (direction === 'right') {
     item.liked = true;
     item.nope = false;
@@ -978,30 +968,15 @@ function handleSwipe(direction) {
 }
 
 function tinderLike() {
-  const btn = document.querySelector('.tinder-btn.like');
-  if (btn) {
-    btn.classList.add('pressed');
-    setTimeout(() => btn.classList.remove('pressed'), 300);
-  }
   handleSwipe('right');
 }
 
 function tinderNope() {
-  const btn = document.querySelector('.tinder-btn.nope');
-  if (btn) {
-    btn.classList.add('pressed');
-    setTimeout(() => btn.classList.remove('pressed'), 300);
-  }
   handleSwipe('left');
 }
 
 function undoLast() {
   if (state.tinderHistory.length === 0) { showToast('Nothing to undo'); return; }
-  
-  // Undo button press animation - yellow
-  const undoBtn = document.querySelector('.tinder-btn.undo');
-  undoBtn.classList.add('pressed');
-  setTimeout(() => undoBtn.classList.remove('pressed'), 300);
   
   const last = state.tinderHistory.pop();
   state.tinderIndex = last.index;
