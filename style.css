@@ -1327,9 +1327,10 @@ body.tinder-mode .toast-container {
 
   /* Toast container hidden state - sync with mobile-nav */
   .toast-container.hidden {
-    transform: translateY(100%) !important;
-    opacity: 0 !important;
-    pointer-events: none !important;
+    /* Move to bottom of screen when nav is hidden */
+    bottom: 10px !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
   }
 
   /* Header scroll hide - iOS Chrome-style smooth transition */
