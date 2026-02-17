@@ -705,7 +705,10 @@ body.tinder-mode {
 
 /* Mobile nav should always be visible in tinder mode */
 body.tinder-mode .mobile-nav {
-  transform: translateY(0);
+  transform: translateY(0) !important;
+  display: flex !important;
+  opacity: 1 !important;
+  visibility: visible !important;
 }
 
 /* Tinder progress bar */
