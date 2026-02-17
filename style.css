@@ -1095,8 +1095,8 @@ main {
   .action-btn { width: 32px; height: 32px; font-size: 0.9rem; }
   .action-btn svg { width: 16px; height: 16px; }
   
-  .tinder-stack { height: calc(100vh - 240px); max-width: 100%; }
-  .tinder-img { height: calc(100vh - 340px); }
+  .tinder-stack { height: 55vh; max-width: 100%; }
+  .tinder-img { height: 40vh; }
   .tinder-content { padding: 12px; }
   .tinder-title { font-size: 1rem; }
   .tinder-btn { width: 56px; height: 56px; font-size: 1.2rem; }
