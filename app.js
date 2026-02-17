@@ -171,6 +171,8 @@ function goHome(e) {
 
 function setMode(m) {
   state.currentMode = m;
+  // Toggle tinder-mode class on body for scroll prevention
+  document.body.classList.toggle('tinder-mode', m === 'tinder');
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.mode === m));
   document.querySelectorAll('.mobile-nav-btn').forEach(b => b.classList.toggle('active', b.dataset.mode === m));
   document.getElementById('grid-view').style.display = m === 'grid' ? 'block' : 'none';
@@ -568,7 +570,8 @@ function updateTinderCard() {
     }
     document.getElementById('tinder-title').textContent = tinderEmptyTitle;
     document.getElementById('tinder-source').textContent = tinderEmptyHint;
-    document.getElementById('tinder-progress').textContent = '';
+    document.getElementById('tinder-progress-fill').style.width = '100%';
+    document.getElementById('tinder-progress-text').textContent = 'Complete!';
     return;
   }
 
@@ -580,7 +583,10 @@ function updateTinderCard() {
   document.getElementById('tinder-type').textContent = it.type.toUpperCase();
   document.getElementById('tinder-title').textContent = it.title;
   document.getElementById('tinder-source').textContent = it.source + ' · ' + formatDate(it.date);
-  document.getElementById('tinder-progress').textContent = (state.tinderIndex + 1) + ' / ' + items.length;
+  // Update progress bar
+  const progress = (state.tinderIndex + 1) / items.length * 100;
+  document.getElementById('tinder-progress-fill').style.width = progress + '%';
+  document.getElementById('tinder-progress-text').textContent = (state.tinderIndex + 1) + ' / ' + items.length;
 }
 
 function formatDate(dateStr) {
