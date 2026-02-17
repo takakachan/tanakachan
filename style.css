@@ -178,10 +178,6 @@ header {
 }
 
 .search-clear {
-  position: absolute;
-  right: 6px;
-  top: 50%;
-  transform: translateY(-50%);
   background: none;
   border: none;
   color: var(--text3);
@@ -189,6 +185,7 @@ header {
   font-size: 0.8rem;
   padding: 4px 6px;
   display: none;
+  flex-shrink: 0;
 }
 
 .search-clear.visible { display: block; }
@@ -1216,13 +1213,15 @@ body.tinder-mode .toast-container {
     border: 1px solid var(--border);
     border-radius: 12px;
     box-shadow: 0 8px 32px rgba(0,0,0,0.4);
-    display: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
     z-index: 200;
     margin-top: 8px;
   }
   
-  .search-box.active { display: block; }
-  .search-input { width: 100%; background: var(--bg); }
+  .search-box.active { display: flex; }
+  .search-input { width: 100%; background: var(--bg); flex: 1; }
   .search-input:focus { width: 100%; }
   
   /* Remove padding adjustment - search is now floating overlay */
