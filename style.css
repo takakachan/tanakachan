@@ -156,11 +156,11 @@ header {
 
 .search-icon {
   position: absolute;
-  left: 10px;
+  left: 12px;
   top: 50%;
   transform: translateY(-50%);
   color: var(--text3);
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   pointer-events: none;
 }
 
