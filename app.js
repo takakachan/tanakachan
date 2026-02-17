@@ -226,6 +226,7 @@ const icons = {
 // Initialize
 function init() {
   loadRssFeeds();
+  loadCardSize();
   loadDemoData();
   setupEvents();
   setupKeyboard();
@@ -342,6 +343,12 @@ function handleSort(sortBy) {
 // Card Size
 function setCardSize(size) {
   state.cardSize = size;
+  // Save to localStorage
+  try {
+    localStorage.setItem('mediaPulseCardSize', size);
+  } catch (e) {
+    console.error('Error saving card size:', e);
+  }
   const root = document.documentElement;
   const gridView = document.getElementById('grid-view');
   
@@ -380,6 +387,18 @@ function setCardSize(size) {
     selector.querySelectorAll('.size-btn').forEach(btn => btn.classList.remove('active'));
     selector.querySelector(`.size-btn[onclick="setCardSize('${size}')"]`)?.classList.add('active');
   });
+}
+
+// Load card size from localStorage
+function loadCardSize() {
+  try {
+    const savedSize = localStorage.getItem('mediaPulseCardSize');
+    if (savedSize && ['small', 'medium', 'large'].includes(savedSize)) {
+      state.cardSize = savedSize;
+    }
+  } catch (e) {
+    console.error('Error loading card size:', e);
+  }
 }
 
 // Multi-select Functions
@@ -754,6 +773,17 @@ function handleSwipe(direction) {
   const item = items[state.tinderIndex];
   const card = document.getElementById('tinder-card');
 
+  // Button press animation - change color then revert
+  if (direction === 'right') {
+    const likeBtn = document.querySelector('.tinder-btn.like');
+    likeBtn.classList.add('pressed');
+    setTimeout(() => likeBtn.classList.remove('pressed'), 300);
+  } else {
+    const nopeBtn = document.querySelector('.tinder-btn.nope');
+    nopeBtn.classList.add('pressed');
+    setTimeout(() => nopeBtn.classList.remove('pressed'), 300);
+  }
+
   if (direction === 'right') {
     item.liked = true;
     item.nope = false;
@@ -784,6 +814,12 @@ function tinderNope() { handleSwipe('left'); }
 
 function undoLast() {
   if (state.tinderHistory.length === 0) { showToast('Nothing to undo'); return; }
+  
+  // Undo button press animation - yellow
+  const undoBtn = document.querySelector('.tinder-btn.undo');
+  undoBtn.classList.add('pressed');
+  setTimeout(() => undoBtn.classList.remove('pressed'), 300);
+  
   const last = state.tinderHistory.pop();
   state.tinderIndex = last.index;
   const items = getFilteredItems();
