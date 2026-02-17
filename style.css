@@ -35,12 +35,14 @@ header {
   left: 0;
   right: 0;
   height: 56px;
+  height: calc(56px + env(safe-area-inset-top));
   background: rgba(15, 15, 15, 0.98);
   backdrop-filter: blur(10px);
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 24px;
+  padding-top: env(safe-area-inset-top);
   z-index: 100;
   border-bottom: 1px solid var(--border);
 }
@@ -1143,7 +1145,7 @@ body.tinder-mode .toast-container {
 /* Mobile Responsive */
 @media (max-width: 768px) {
   .toast-container {
-    bottom: 75px;
+    bottom: calc(75px + env(safe-area-inset-bottom));
     top: auto;
     right: 10px;
     left: auto;
