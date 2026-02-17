@@ -1103,9 +1103,14 @@ function confirmDelete() {
   if (deleteTarget !== null) {
     if (deleteType === 'like') {
       const x = state.items.find(i => i.id === deleteTarget);
-      if (x) { x.liked = false; showToast('Removed from Collected'); }
+      if (x) { 
+        x.liked = false; 
+        x.nope = true; // Also add to nope list
+        showToast('Moved to Nope'); 
+      }
     }
     renderLikes();
+    renderNope();
     closeConfirm();
   }
 }

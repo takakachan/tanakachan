@@ -678,9 +678,10 @@ main {
 }
 
 .card-size-s .card-actions-mini {
-  position: absolute;
-  top: 4px;
-  right: 4px;
+  position: relative;
+  top: auto;
+  right: auto;
+  margin-top: 4px;
 }
 
 .card-size-s .card {
