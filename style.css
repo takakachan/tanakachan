@@ -158,17 +158,14 @@ header {
 
 .search-icon {
   position: absolute;
-  left: 4px;
+  left: 12px;
   top: 50%;
   transform: translateY(-50%);
   color: var(--text3);
   font-size: 0.75rem;
   pointer-events: none;
   z-index: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 16px;
+}
   height: 16px;
 }
 
