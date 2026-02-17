@@ -136,7 +136,7 @@ header {
 }
 
 /* Search Box */
-.search-box { position: relative; width: 200px; overflow: hidden; }
+.search-box { position: relative; width: 200px; overflow: hidden; transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
 
 .search-input {
   width: 100%;
@@ -156,7 +156,7 @@ header {
 
 .search-icon {
   position: absolute;
-  left: 10px;
+  left: 12px;
   top: 50%;
   transform: translateY(-50%);
   color: var(--text3);
@@ -1270,7 +1270,7 @@ body.tinder-mode .toast-container {
   
   /* Hide mobile nav when Tinder mode is active on mobile */
   body.tinder-mode .mobile-nav {
-    transform: translateY(100%);
+    display: none;
   }
   
   .mobile-nav-btn {
@@ -1293,7 +1293,7 @@ body.tinder-mode .toast-container {
   }
   
   .mobile-nav-btn:active {
-    background: rgba(99, 102, 241, 0.15);
+    background: rgba(248, 114, 124, 0.15);
   }
   
   .mobile-nav-btn:active .mobile-nav-icon,
@@ -1307,7 +1307,7 @@ body.tinder-mode .toast-container {
   
   .mobile-nav-btn.active {
     color: var(--accent);
-    background: rgba(99, 102, 241, 0.1);
+    background: rgba(248, 114, 124, 0.1);
   }
   
   .mobile-nav-btn.active .mobile-nav-icon {
