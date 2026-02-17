@@ -1163,52 +1163,81 @@ function setupTinderSwipe() {
   });
 }
 
-// Twitter-style mobile nav & header: hide on scroll down, show on scroll up
+// iOS Chrome/PWA-style mobile nav & header: hide on scroll down, show on scroll up
+// Similar to iOS Safari/Chrome bottom bar behavior
 (function() {
   let lastScrollY = 0;
   let ticking = false;
-  let showTimeout = null;
+  let scrollTimeout = null;
   const mobileNav = document.querySelector('.mobile-nav');
   const header = document.querySelector('header');
-  const SCROLL_THRESHOLD = 8;
-  const SHOW_DELAY = 150; // ms to wait after scroll stops before showing
+  
+  // iOS Chrome-style configuration
+  const SCROLL_THRESHOLD = 10; // pixels to scroll before reacting
+  const SHOW_DELAY = 100; // minimal delay for smooth feel
+  const TOP_THRESHOLD = 5; // consider "at top" if within this many pixels
   
   if (!mobileNav) return;
   
+  let isNavHidden = false;
+  
   function updateNav(scrollY) {
     const diff = scrollY - lastScrollY;
-    const isAtTop = scrollY <= 0;
+    const isAtTop = scrollY <= TOP_THRESHOLD;
+    const isScrollingDown = diff > SCROLL_THRESHOLD;
+    const isScrollingUp = diff < -SCROLL_THRESHOLD;
     
-    // Always show at page top
+    // Always show when at page top
     if (isAtTop) {
-      clearTimeout(showTimeout);
-      mobileNav.classList.remove('hidden');
-      if (header) header.classList.remove('scroll-hidden');
+      if (isNavHidden) {
+        mobileNav.classList.remove('hidden');
+        if (header) header.classList.remove('scroll-hidden');
+        isNavHidden = false;
+      }
       lastScrollY = scrollY;
       ticking = false;
       return;
     }
     
-    // Scroll down - hide nav and header
-    if (diff > SCROLL_THRESHOLD) {
-      clearTimeout(showTimeout);
-      mobileNav.classList.add('hidden');
-      if (header) header.classList.add('scroll-hidden');
+    // Scroll down - hide nav and header immediately (iOS Chrome style)
+    if (isScrollingDown) {
+      if (!isNavHidden) {
+        mobileNav.classList.add('hidden');
+        if (header) header.classList.add('scroll-hidden');
+        isNavHidden = true;
+      }
     }
-    // Scroll up - show after delay
-    else if (diff < -SCROLL_THRESHOLD) {
-      clearTimeout(showTimeout);
-      showTimeout = setTimeout(() => {
+    // Scroll up - show nav and header immediately (iOS Chrome style)
+    else if (isScrollingUp) {
+      if (isNavHidden) {
         mobileNav.classList.remove('hidden');
         if (header) header.classList.remove('scroll-hidden');
-      }, SHOW_DELAY);
+        isNavHidden = false;
+      }
     }
     
     lastScrollY = scrollY;
     ticking = false;
   }
   
+  // Handle scroll end - re-check position after scrolling stops
+  function handleScrollEnd() {
+    clearTimeout(scrollTimeout);
+    scrollTimeout = setTimeout(() => {
+      const scrollY = window.scrollY;
+      const isAtTop = scrollY <= TOP_THRESHOLD;
+      
+      // When scroll stops, ensure proper state
+      if (isAtTop && isNavHidden) {
+        mobileNav.classList.remove('hidden');
+        if (header) header.classList.remove('scroll-hidden');
+        isNavHidden = false;
+      }
+    }, 150); // Wait 150ms after scroll stops to check position
+  }
+  
   window.addEventListener('scroll', () => {
+    handleScrollEnd();
     if (!ticking) {
       window.requestAnimationFrame(() => updateNav(window.scrollY));
       ticking = true;

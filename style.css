@@ -1317,11 +1317,16 @@ body.tinder-mode .toast-container {
     justify-content: space-around;
     align-items: center;
     z-index: 99999 !important;
+    /* iOS Chrome-style smooth transition */
     transform: translateY(0) !important;
     opacity: 1 !important;
-    transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.25s ease !important;
-    border-radius: 0 0 0 0;
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease !important;
+    -webkit-transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease !important;
+    -webkit-transform: translateY(0);
+    border-radius: 0;
     pointer-events: auto !important;
+    /* Improve performance */
+    will-change: transform, opacity;
   }
   
   /* Hidden state - slide down and fade */
@@ -1331,7 +1336,7 @@ body.tinder-mode .toast-container {
     pointer-events: none !important;
   }
 
-  /* Header scroll hide */
+  /* Header scroll hide - iOS Chrome-style smooth transition */
   header.scroll-hidden {
     transform: translateY(calc(-100% - env(safe-area-inset-top))) !important;
     opacity: 0 !important;
@@ -1339,7 +1344,9 @@ body.tinder-mode .toast-container {
   }
   
   header {
-    transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.25s ease !important;
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease !important;
+    -webkit-transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease !important;
+    will-change: transform, opacity;
   }
   
   /* In tinder mode, adjust main padding to above mobile nav */
