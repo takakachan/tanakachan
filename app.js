@@ -273,6 +273,11 @@ function toggleItemSelection(id) {
   const card = document.querySelector(`.card[data-id="${id}"]`);
   if (card) {
     card.classList.toggle('selected', state.selectedItems.has(id));
+    // Also toggle checked class on checkbox
+    const checkbox = card.querySelector('.card-checkbox');
+    if (checkbox) {
+      checkbox.classList.toggle('checked', state.selectedItems.has(id));
+    }
   }
 }
 
