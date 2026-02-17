@@ -675,7 +675,7 @@ body.tinder-mode {
 .tinder-progress-wrap {
   width: 100%;
   max-width: 340px;
-  margin-top: 16px;
+  margin-bottom: 16px;
   display: flex;
   flex-direction: column;
   gap: 6px;

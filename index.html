@@ -71,6 +71,12 @@
       <div class="masonry" id="cards"></div>
     </div>
     <div class="tinder-view" id="tinder-view">
+      <div class="tinder-progress-wrap">
+        <div class="tinder-progress-bar">
+          <div class="tinder-progress-fill" id="tinder-progress-fill"></div>
+        </div>
+        <div class="tinder-progress-text" id="tinder-progress-text"></div>
+      </div>
       <div class="tinder-stack">
         <div class="tinder-card" id="tinder-card">
           <div class="tinder-stamp like">LIKE</div>
@@ -87,12 +93,6 @@
         <button class="tinder-btn nope" onclick="tinderNope()" title="Pass (←)"><svg viewBox="0 0 24 24" style="width:28px;height:28px;fill:currentColor"><path d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z"/></svg></button>
         <button class="tinder-btn undo" onclick="undoLast()" title="Undo"><svg viewBox="0 0 24 24" style="width:28px;height:28px;fill:currentColor"><path d="M12.5 8c-2.65 0-5.05.99-6.9 2.6L2 7v9h9l-3.62-3.62c1.39-1.16 3.16-1.88 5.12-1.88 3.54 0 6.55 2.31 7.6 5.5l2.37-.78C21.08 11.03 17.15 8 12.5 8z"/></svg></button>
         <button class="tinder-btn like" onclick="tinderLike()" title="Collect (→)"><svg viewBox="0 0 24 24" style="width:28px;height:28px;fill:currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg></button>
-      </div>
-      <div class="tinder-progress-wrap">
-        <div class="tinder-progress-bar">
-          <div class="tinder-progress-fill" id="tinder-progress-fill"></div>
-        </div>
-        <div class="tinder-progress-text" id="tinder-progress-text"></div>
       </div>
       <div class="tinder-hint">Use <span class="kbd">←</span> <span class="kbd">→</span> or swipe</div>
     </div>

@@ -1,0 +1,23 @@
+{
+  "name": "media-pulse",
+  "version": "1.0.0",
+  "description": "お気に入りメディアの更新情報を一括チェックできるWebアプリです。",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://takakachan@github.com/takakachan/tanakachan.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/takakachan/tanakachan/issues"
+  },
+  "homepage": "https://github.com/takakachan/tanakachan#readme",
+  "dependencies": {
+    "playwright": "^1.58.2"
+  }
+}
