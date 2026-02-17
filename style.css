@@ -1040,7 +1040,7 @@ main {
 /* Mobile Responsive */
 @media (max-width: 768px) {
   .toast-container {
-    bottom: 80px;
+    bottom: 100px;
     right: 10px;
     left: 10px;
   }
