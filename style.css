@@ -206,10 +206,10 @@ header {
 
 /* Main Content */
 main {
-  padding-top: 80px;
+  padding-top: 64px;
   padding-left: 32px;
   padding-right: 32px;
-  padding-bottom: 60px;
+  padding-bottom: 64px;
   max-width: 1800px;
   margin: 0 auto;
 }
@@ -328,7 +328,7 @@ main {
   background: var(--bg3);
 }
 
-.card-body { padding: 12px; }
+.card-body { padding: 16px; }
 
 .card-type {
   font-size: 0.6rem;
@@ -354,6 +354,7 @@ main {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-top: 12px;
 }
 
 .card-source {
@@ -1070,10 +1071,11 @@ main {
     padding-top: 120px;
   }
   
-  main { padding: 52px 12px 80px; padding-left: 8px; padding-right: 8px; }
+  main { padding: 56px 12px 80px; padding-left: 8px; padding-right: 8px; }
   .masonry { columns: 2 140px; column-gap: 8px; }
   .card { margin-bottom: 8px; break-inside: avoid; }
-  .card-body { padding: 16px; }
+  .card-body { padding: 14px; }
+  .card-meta { margin-top: 10px; }
   .card-title { font-size: 0.8rem; }
   .card-type { font-size: 0.6rem; }
   
