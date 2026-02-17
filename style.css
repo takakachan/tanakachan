@@ -138,7 +138,7 @@ header {
 }
 
 /* Search Box */
-.search-box { position: relative; width: 200px; overflow: hidden; transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
+.search-box { position: relative; width: 200px; overflow: hidden; transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1); flex-shrink: 0; }
 
 .search-input {
   width: 100%;
@@ -671,7 +671,8 @@ main {
 }
 
 /* Card Size - M (2 columns) */
-.card-size-m .masonry {
+.card-size-m .masonry,
+.masonry.card-size-m {
   column-count: 2;
   column-width: auto;
 }
@@ -1335,6 +1336,11 @@ body.tinder-mode .toast-container {
     pointer-events: none !important;
   }
 
+  /* Toast container transition for smooth movement */
+  .toast-container {
+    transition: bottom 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  }
+
   /* Toast container hidden state - sync with mobile-nav */
   .toast-container.hidden {
     /* Move to bottom of screen when nav is hidden */
@@ -1380,7 +1386,8 @@ body.tinder-mode .toast-container {
     transition: background 0.15s ease, color 0.15s ease;
     padding: 8px 4px;
     overflow: hidden;
-    border-radius: 8px 8px 0 0;
+    border-radius: 6px;
+    margin: 2px 3px;
   }
   
   .mobile-nav-btn:active {

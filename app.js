@@ -960,33 +960,45 @@ function handleSwipe(direction) {
     saveNopeTimestamps();
   }
 
-  card.style.transition = 'transform 0.4s, opacity 0.4s';
-  card.style.transform = `translateX(${direction === 'right' ? 500 : -500}px) rotate(${direction === 'right' ? 90 : -90}deg)`;
-  card.style.opacity = '0';
+  // Show stamp for 300ms before card flies away
+  const stampEl = direction === 'right'
+    ? card.querySelector('.tinder-stamp.like')
+    : card.querySelector('.tinder-stamp.nope');
+  if (stampEl) stampEl.classList.add('show');
 
   setTimeout(() => {
-    state.tinderIndex++;
-    card.style.transition = 'none';
-    card.style.transform = '';
-    card.style.opacity = '';
-    card.querySelector('.tinder-stamp.like').classList.remove('show');
-    card.querySelector('.tinder-stamp.nope').classList.remove('show');
-    updateTinderCard();
-  }, 500);
+    card.style.transition = 'transform 0.4s, opacity 0.4s';
+    card.style.transform = `translateX(${direction === 'right' ? 500 : -500}px) rotate(${direction === 'right' ? 90 : -90}deg)`;
+    card.style.opacity = '0';
+
+    setTimeout(() => {
+      state.tinderIndex++;
+      card.style.transition = 'none';
+      card.style.transform = '';
+      card.style.opacity = '';
+      card.querySelector('.tinder-stamp.like').classList.remove('show');
+      card.querySelector('.tinder-stamp.nope').classList.remove('show');
+      updateTinderCard();
+    }, 400);
+  }, 300);
 }
 
 function tinderLike() {
-  handleSwipe('right');
-  // Remove pressed class to return to default color
   const likeBtn = document.querySelector('.tinder-btn.like');
-  if (likeBtn) likeBtn.classList.remove('pressed');
+  if (likeBtn) {
+    likeBtn.classList.add('pressed');
+    setTimeout(() => likeBtn.classList.remove('pressed'), 200);
+  }
+  handleSwipe('right');
 }
 
 function tinderNope() {
-  handleSwipe('left');
-  // Remove pressed class to return to default color
   const nopeBtn = document.querySelector('.tinder-btn.nope');
-  if (nopeBtn) nopeBtn.classList.remove('pressed');
+  if (nopeBtn) {
+    nopeBtn.classList.add('pressed');
+    setTimeout(() => nopeBtn.classList.remove('pressed'), 200);
+  }
+  handleSwipe('left');
 }
 
 function undoLast() {
@@ -1118,7 +1130,7 @@ function setupTinderSwipe() {
   document.addEventListener('mousemove', e => {
     if (!isDragging) return;
     currentX = e.clientX - startX;
-    const rot = currentX * 0.05;
+    const rot = currentX * 0.08;
     tc.style.transform = `translateX(${currentX}px) rotate(${rot}deg)`;
     const sl = tc.querySelector('.tinder-stamp.like');
     const sn = tc.querySelector('.tinder-stamp.nope');
@@ -1153,7 +1165,7 @@ function setupTinderSwipe() {
     if (!isDragging) return;
     e.preventDefault();
     currentX = e.touches[0].clientX - startX;
-    const rot = currentX * 0.05;
+    const rot = currentX * 0.08;
     tc.style.transform = `translateX(${currentX}px) rotate(${rot}deg)`;
     const sl = tc.querySelector('.tinder-stamp.like');
     const sn = tc.querySelector('.tinder-stamp.nope');
