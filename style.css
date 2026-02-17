@@ -1283,11 +1283,6 @@ body.tinder-mode .toast-container {
     transform: translateY(0);
   }
   
-  /* Hide mobile nav when Tinder mode is active on mobile */
-  body.tinder-mode .mobile-nav {
-    display: none;
-  }
-  
   .mobile-nav-btn {
     flex: 1;
     display: flex;
