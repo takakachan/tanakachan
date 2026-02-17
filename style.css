@@ -140,7 +140,7 @@ header {
 
 .search-input {
   width: 100%;
-  padding: 8px 12px 8px 36px;
+  padding: 8px 12px 8px 32px;
   border-radius: var(--card-radius);
   border: 1px solid var(--border);
   background: var(--bg2);
@@ -156,7 +156,7 @@ header {
 
 .search-icon {
   position: absolute;
-  left: 12px;
+  left: 16px;
   top: 50%;
   transform: translateY(-50%);
   color: var(--text3);
@@ -809,7 +809,7 @@ body.tinder-mode .toast-container {
   display: flex;
   gap: 12px;
   margin-top: 8px;
-  margin-bottom: 70px;
+  margin-bottom: 40px;
 }
 
 .tinder-btn {
@@ -1267,16 +1267,15 @@ body.tinder-mode .toast-container {
   
   .mobile-nav-btn:active {
     background: rgba(99, 102, 241, 0.15);
-    transform: scale(0.95);
   }
   
   .mobile-nav-btn:active .mobile-nav-icon,
   .mobile-nav-btn:active span {
-    transform: scale(1);
+    transform: scale(0.95);
   }
   
   .mobile-nav-btn:active .mobile-nav-icon svg {
-    transform: scale(1);
+    transform: scale(0.95);
   }
   
   .mobile-nav-btn.active {
