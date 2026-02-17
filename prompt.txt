@@ -1,0 +1,22 @@
+In /home/tanaka/.openclaw/workspace/media-pulse, make these changes WITHOUT using AI inference - use the Edit tool directly:
+
+1. style.css changes:
+   - .tinder-btn: width/height 72px → 52px, gap 20px → 12px
+   - .tinder-stack: max-width 340px → 300px, height 480px → 420px
+   - .tinder-progress-bar: height 3px → 2px
+   - Add .tinder-btn.nope.pressed { background: #a78bfa; border-color: #a78bfa; color: white; }
+   - Add .tinder-btn.undo.pressed { background: #fbbf24; border-color: #fbbf24; color: #1a1a1a; }
+   - .mobile-nav height 56px → 64px
+   - .toast-container bottom 90px → 85px
+   - body.tinder-mode .toast-container bottom 140px → 160px
+   - Mobile .tinder-btn: 60px → 48px, gap 16px → 12px, margin-bottom 70px → 80px
+
+2. index.html:
+   - Remove the <div class="view-toggle">...</div> from #likes-view (keep the size-selector)
+
+3. app.js changes:
+   - In setCardSize(): add localStorage.setItem('mediaPulseCardSize', size)
+   - Add new function loadCardSize(): read from localStorage and set state.cardSize
+   - In init(): call loadCardSize() before setCardSize()
+
+Use Edit tool to make these precise changes. Do NOT summarize - just edit the files.

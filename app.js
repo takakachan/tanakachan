@@ -346,11 +346,25 @@ function clearSearch() {
   state.searchQuery = '';
   document.querySelector('.search-clear')?.classList.remove('visible');
   render();
+  // Also clear search in likes and nope views
+  if (state.currentMode === 'likes') {
+    renderLikes();
+  }
+  if (state.currentMode === 'nope') {
+    renderNope();
+  }
 }
 
 function handleSearch(query) {
   state.searchQuery = query.toLowerCase().trim();
   render();
+  // Also update likes and nope views when search is active
+  if (state.currentMode === 'likes') {
+    renderLikes();
+  }
+  if (state.currentMode === 'nope') {
+    renderNope();
+  }
 }
 
 // Navigation
@@ -670,6 +684,14 @@ function renderLikes() {
     items = items.filter(x => x.type === state.likesFilter);
   }
 
+  // Apply search filter in likes view
+  if (state.searchQuery) {
+    items = items.filter(x =>
+      x.title.toLowerCase().includes(state.searchQuery) ||
+      x.source.toLowerCase().includes(state.searchQuery)
+    );
+  }
+
   if (state.likesSortBy === 'newest') {
     items = [...items].sort((a, b) => new Date(b.date) - new Date(a.date));
   } else if (state.likesSortBy === 'oldest') {
@@ -679,7 +701,13 @@ function renderLikes() {
   }
 
   if (!items.length) {
-    document.getElementById('likes-cards').innerHTML = '<div class="empty"><div class="empty-icon">♡</div><div class="empty-title">No collected items yet</div><div class="empty-text">Heart content while exploring to save it here for later</div></div>';
+    let emptyTitle = 'No collected items yet';
+    let emptyText = 'Heart content while exploring to save it here for later';
+    if (state.searchQuery) {
+      emptyTitle = 'No matches for "' + state.searchQuery + '"';
+      emptyText = 'Try a different search term or clear the search';
+    }
+    document.getElementById('likes-cards').innerHTML = '<div class="empty"><div class="empty-icon">♡</div><div class="empty-title">' + emptyTitle + '</div><div class="empty-text">' + emptyText + '</div></div>';
     document.getElementById('likes-count-badge').textContent = '0';
     return;
   }
@@ -708,6 +736,14 @@ function renderLikes() {
 function renderNope() {
   let items = state.items.filter(x => x.nope);
   
+  // Apply search filter in nope view
+  if (state.searchQuery) {
+    items = items.filter(x =>
+      x.title.toLowerCase().includes(state.searchQuery) ||
+      x.source.toLowerCase().includes(state.searchQuery)
+    );
+  }
+  
   if (state.nopeSortBy === 'newest') {
     items = [...items].sort((a, b) => new Date(b.date) - new Date(a.date));
   } else if (state.nopeSortBy === 'oldest') {
@@ -717,7 +753,13 @@ function renderNope() {
   }
   
   if (!items.length) {
-    document.getElementById('nope-cards').innerHTML = '<div class="empty"><div class="empty-icon">✕</div><div class="empty-title">No nope items</div><div class="empty-text">Pass on content while exploring to add it here</div></div>';
+    let emptyTitle = 'No nope items';
+    let emptyText = 'Pass on content while exploring to add it here';
+    if (state.searchQuery) {
+      emptyTitle = 'No matches for "' + state.searchQuery + '"';
+      emptyText = 'Try a different search term or clear the search';
+    }
+    document.getElementById('nope-cards').innerHTML = '<div class="empty"><div class="empty-icon">✕</div><div class="empty-title">' + emptyTitle + '</div><div class="empty-text">' + emptyText + '</div></div>';
     document.getElementById('nope-count-badge').textContent = '0';
     return;
   }

@@ -140,7 +140,7 @@ header {
 
 .search-input {
   width: 100%;
-  padding: 8px 12px 8px 32px;
+  padding: 8px 12px 8px 36px;
   border-radius: var(--card-radius);
   border: 1px solid var(--border);
   background: var(--bg2);
@@ -148,6 +148,7 @@ header {
   font-size: 0.8rem;
   outline: none;
   transition: var(--transition);
+  line-height: 1.2;
 }
 
 .search-input:focus { border-color: var(--text2); }
@@ -657,8 +658,8 @@ main {
   display: none;
   flex-direction: column;
   align-items: center;
-  padding: 24px 16px;
-  padding-top: 20px;
+  padding: 12px 16px;
+  padding-top: 8px;
 }
 
 .tinder-view.active { display: flex; }
@@ -807,8 +808,8 @@ body.tinder-mode .toast-container {
 .tinder-controls {
   display: flex;
   gap: 12px;
-  margin-top: 12px;
-  margin-bottom: 90px;
+  margin-top: 8px;
+  margin-bottom: 70px;
 }
 
 .tinder-btn {
@@ -1123,23 +1124,30 @@ body.tinder-mode .toast-container {
   .logo { font-size: 0.95rem; }
   
   .search-box {
-    position: absolute;
+    position: fixed;
     top: 52px;
-    left: 0;
-    right: 0;
-    background: var(--bg);
-    padding: 12px;
-    border-bottom: 1px solid var(--border);
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(100% - 24px);
+    max-width: 400px;
+    background: var(--bg2);
+    padding: 12px 16px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
     display: none;
+    z-index: 200;
+    margin-top: 8px;
   }
   
   .search-box.active { display: block; }
-  .search-input { width: 100%; }
+  .search-input { width: 100%; background: var(--bg); }
   .search-input:focus { width: 100%; }
   
+  /* Remove padding adjustment - search is now floating overlay */
   .search-box.active ~ main,
   body.search-active main {
-    padding-top: 120px;
+    padding-top: 56px;
   }
   
   main { padding: 56px 12px 80px; padding-left: 8px; padding-right: 8px; }
@@ -1176,19 +1184,19 @@ body.tinder-mode .toast-container {
   .action-btn { width: 32px; height: 32px; font-size: 0.9rem; }
   .action-btn svg { width: 16px; height: 16px; }
   
-  .tinder-stack { height: 60vh; max-width: 100%; }
-  .tinder-img { height: 40vh; }
+  .tinder-stack { height: 55vh; max-width: 100%; }
+  .tinder-img { height: 38vh; }
   .tinder-content { padding: 10px; }
   .tinder-title { font-size: 0.95rem; margin-bottom: 8px; }
   .tinder-type { font-size: 0.6rem; margin-bottom: 6px; }
   .tinder-source { font-size: 0.75rem; }
   .tinder-btn { width: 48px; height: 48px; font-size: 1.3rem; }
   .tinder-btn svg { width: 24px; height: 24px; }
-  .tinder-controls { gap: 12px; margin-top: 12px; margin-bottom: 80px; }
+  .tinder-controls { gap: 12px; margin-top: 8px; margin-bottom: 70px; }
   .tinder-stamp { font-size: 1.6rem; padding: 10px 18px; top: 12px; letter-spacing: 3px; }
   .tinder-stamp.like { right: 12px; }
   .tinder-stamp.nope { left: 12px; }
-  .tinder-progress-wrap { margin-top: 10px; }
+  .tinder-progress-wrap { margin-top: 4px; margin-bottom: 4px; }
   .tinder-hint { display: none; }
   
   /* Tinder mode toast on mobile */
@@ -1261,12 +1269,10 @@ body.tinder-mode .toast-container {
     background: rgba(99, 102, 241, 0.1);
   }
   
-  .mobile-nav-btn:active .mobile-nav-icon {
-    transform: scale(0.95);
-  }
-  
+  /* Fix: Animate entire button content together (icon + text) */
+  .mobile-nav-btn:active .mobile-nav-icon,
   .mobile-nav-btn:active span {
-    transform: scale(0.95);
+    transform: scale(0.92);
   }
   .mobile-nav-btn.active {
     color: var(--accent);
