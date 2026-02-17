@@ -1192,7 +1192,7 @@ body.tinder-mode .toast-container {
   .tinder-source { font-size: 0.75rem; }
   .tinder-btn { width: 48px; height: 48px; font-size: 1.3rem; }
   .tinder-btn svg { width: 24px; height: 24px; }
-  .tinder-controls { gap: 12px; margin-top: 8px; margin-bottom: 55px; }
+  .tinder-controls { gap: 12px; margin-top: 8px; margin-bottom: 45px; }
   .tinder-stamp { font-size: 1.6rem; padding: 10px 18px; top: 12px; letter-spacing: 3px; }
   .tinder-stamp.like { right: 12px; }
   .tinder-stamp.nope { left: 12px; }
@@ -1267,15 +1267,16 @@ body.tinder-mode .toast-container {
   
   .mobile-nav-btn:active {
     background: rgba(99, 102, 241, 0.15);
+    transform: scale(0.95);
   }
   
   .mobile-nav-btn:active .mobile-nav-icon,
   .mobile-nav-btn:active span {
-    transform: scale(0.95);
+    transform: scale(1);
   }
   
   .mobile-nav-btn:active .mobile-nav-icon svg {
-    transform: scale(0.95);
+    transform: scale(1);
   }
   
   .mobile-nav-btn.active {
