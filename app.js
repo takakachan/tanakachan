@@ -1163,27 +1163,45 @@ function setupTinderSwipe() {
   });
 }
 
-// Twitter-style mobile nav: hide on scroll down, show on scroll up
+// Twitter-style mobile nav & header: hide on scroll down, show on scroll up
 (function() {
   let lastScrollY = 0;
   let ticking = false;
-  let hideTimeout = null;
+  let showTimeout = null;
   const mobileNav = document.querySelector('.mobile-nav');
+  const header = document.querySelector('header');
+  const SCROLL_THRESHOLD = 8;
+  const SHOW_DELAY = 150; // ms to wait after scroll stops before showing
   
   if (!mobileNav) return;
   
   function updateNav(scrollY) {
     const diff = scrollY - lastScrollY;
+    const isAtTop = scrollY <= 0;
     
-    // Scroll down - hide nav
-    if (diff > 10) {
-      clearTimeout(hideTimeout);
-      mobileNav.classList.add('hidden');
-    }
-    // Scroll up - show nav
-    else if (diff < -10) {
-      clearTimeout(hideTimeout);
+    // Always show at page top
+    if (isAtTop) {
+      clearTimeout(showTimeout);
       mobileNav.classList.remove('hidden');
+      if (header) header.classList.remove('scroll-hidden');
+      lastScrollY = scrollY;
+      ticking = false;
+      return;
+    }
+    
+    // Scroll down - hide nav and header
+    if (diff > SCROLL_THRESHOLD) {
+      clearTimeout(showTimeout);
+      mobileNav.classList.add('hidden');
+      if (header) header.classList.add('scroll-hidden');
+    }
+    // Scroll up - show after delay
+    else if (diff < -SCROLL_THRESHOLD) {
+      clearTimeout(showTimeout);
+      showTimeout = setTimeout(() => {
+        mobileNav.classList.remove('hidden');
+        if (header) header.classList.remove('scroll-hidden');
+      }, SHOW_DELAY);
     }
     
     lastScrollY = scrollY;
