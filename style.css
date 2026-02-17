@@ -142,7 +142,7 @@ header {
 
 .search-input {
   width: 100%;
-  padding: 8px 12px 8px 32px;
+  padding: 8px 12px 8px 34px;
   border-radius: var(--card-radius);
   border: 1px solid var(--border);
   background: var(--bg2);
@@ -158,7 +158,7 @@ header {
 
 .search-icon {
   position: absolute;
-  left: 10px;
+  left: 12px;
   top: 50%;
   transform: translateY(-50%);
   color: var(--text3);
@@ -573,7 +573,6 @@ main {
 
 /* Multi-select Toggle Button */
 .multi-select-toggle {
-  margin-right: auto;
   padding: 8px 12px;
   border: 1px solid var(--border);
   background: transparent;
