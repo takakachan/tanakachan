@@ -138,11 +138,20 @@ header {
 }
 
 /* Search Box */
-.search-box { position: relative; width: 200px; overflow: visible; transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1); flex-shrink: 0; }
+.search-box { 
+  position: relative; 
+  width: 200px; 
+  overflow: visible; 
+  transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1); 
+  flex-shrink: 0; 
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
 
 .search-input {
   width: 100%;
-  padding: 8px 28px 8px 36px;
+  padding: 8px 28px 8px 8px;
   border-radius: var(--card-radius);
   border: 1px solid var(--border);
   background: var(--bg2);
@@ -151,20 +160,19 @@ header {
   outline: none;
   transition: var(--transition);
   line-height: 1.2;
+  flex: 1;
 }
 
 .search-input:focus { border-color: var(--text2); }
 .search-input::placeholder { color: var(--text3); }
 
 .search-icon {
-  position: absolute;
-  left: 16px;
-  top: 50%;
-  transform: translateY(-50%);
   color: var(--text3);
   font-size: 0.75rem;
   pointer-events: none;
-  z-index: 2;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
 }
   height: 16px;
 }
