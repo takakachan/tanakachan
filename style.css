@@ -746,7 +746,7 @@ body.tinder-mode .mobile-nav {
 /* Tinder mode - toast at bottom right (same position as normal mode) */
 body.tinder-mode .toast-container {
   top: auto;
-  bottom: 70px;
+  bottom: 55px;
   right: 20px;
   left: auto;
 }
@@ -1093,7 +1093,7 @@ body.tinder-mode .toast-container {
 /* Toast */
 .toast-container {
   position: fixed;
-  bottom: 75px;
+  bottom: 55px;
   right: 20px;
   z-index: 300;
   display: flex;
@@ -1183,7 +1183,7 @@ body.tinder-mode .toast-container {
 /* Mobile Responsive */
 @media (max-width: 768px) {
   .toast-container {
-    bottom: calc(75px + env(safe-area-inset-bottom));
+    bottom: calc(55px + env(safe-area-inset-bottom));
     top: auto;
     right: 10px;
     left: auto;
@@ -1275,7 +1275,7 @@ body.tinder-mode .toast-container {
   
   /* Tinder mode toast on mobile - same position as normal mode */
   body.tinder-mode .toast-container {
-    bottom: 70px;
+    bottom: 55px;
     right: 10px;
   }
   
@@ -1331,6 +1331,13 @@ body.tinder-mode .toast-container {
   
   /* Hidden state - slide down and fade */
   .mobile-nav.hidden {
+    transform: translateY(100%) !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+
+  /* Toast container hidden state - sync with mobile-nav */
+  .toast-container.hidden {
     transform: translateY(100%) !important;
     opacity: 0 !important;
     pointer-events: none !important;

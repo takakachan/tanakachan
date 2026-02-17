@@ -1170,6 +1170,7 @@ function setupTinderSwipe() {
   let ticking = false;
   let scrollTimeout = null;
   const mobileNav = document.querySelector('.mobile-nav');
+  const toastContainer = document.querySelector('.toast-container');
   const header = document.querySelector('header');
   
   // iOS Chrome-style configuration
@@ -1191,6 +1192,7 @@ function setupTinderSwipe() {
     if (isAtTop) {
       if (isNavHidden) {
         mobileNav.classList.remove('hidden');
+        if (toastContainer) toastContainer.classList.remove('hidden');
         if (header) header.classList.remove('scroll-hidden');
         isNavHidden = false;
       }
@@ -1203,6 +1205,7 @@ function setupTinderSwipe() {
     if (isScrollingDown) {
       if (!isNavHidden) {
         mobileNav.classList.add('hidden');
+        if (toastContainer) toastContainer.classList.add('hidden');
         if (header) header.classList.add('scroll-hidden');
         isNavHidden = true;
       }
@@ -1211,6 +1214,7 @@ function setupTinderSwipe() {
     else if (isScrollingUp) {
       if (isNavHidden) {
         mobileNav.classList.remove('hidden');
+        if (toastContainer) toastContainer.classList.remove('hidden');
         if (header) header.classList.remove('scroll-hidden');
         isNavHidden = false;
       }
@@ -1230,6 +1234,7 @@ function setupTinderSwipe() {
       // When scroll stops, ensure proper state
       if (isAtTop && isNavHidden) {
         mobileNav.classList.remove('hidden');
+        if (toastContainer) toastContainer.classList.remove('hidden');
         if (header) header.classList.remove('scroll-hidden');
         isNavHidden = false;
       }
