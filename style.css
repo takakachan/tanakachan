@@ -951,7 +951,7 @@ main {
 /* Toast */
 .toast-container {
   position: fixed;
-  bottom: 20px;
+  top: 70px;
   right: 20px;
   z-index: 300;
   display: flex;
@@ -960,10 +960,10 @@ main {
 }
 
 .toast {
-  padding: 10px 16px;
+  padding: 8px 14px;
   background: var(--bg);
   border: 1px solid var(--border);
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   animation: toastIn 0.2s ease;
 }
 
@@ -1041,12 +1041,16 @@ main {
 /* Mobile Responsive */
 @media (max-width: 768px) {
   .toast-container {
-    bottom: 100px;
+    top: 60px;
+    bottom: auto;
     right: 10px;
-    left: 10px;
+    left: auto;
+    width: auto;
   }
   .toast-container > * {
-    width: 100%;
+    width: auto;
+    font-size: 0.7rem;
+    padding: 6px 12px;
   }
   header { padding: 0 12px; height: 52px; }
   .logo { font-size: 0.95rem; }
