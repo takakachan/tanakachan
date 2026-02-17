@@ -1070,10 +1070,10 @@ main {
     padding-top: 120px;
   }
   
-  main { padding: 64px 12px 80px; padding-left: 8px; padding-right: 8px; }
+  main { padding: 52px 12px 80px; padding-left: 8px; padding-right: 8px; }
   .masonry { columns: 2 140px; column-gap: 8px; }
   .card { margin-bottom: 8px; break-inside: avoid; }
-  .card-body { padding: 12px; }
+  .card-body { padding: 16px; }
   .card-title { font-size: 0.8rem; }
   .card-type { font-size: 0.6rem; }
   
