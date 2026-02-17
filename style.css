@@ -165,9 +165,9 @@ header {
 
 .search-icon {
   position: absolute;
-  left: 8px;
-  top: 50%;
-  transform: translateY(-50%);
+  left: 12px;
+  top: 55%;
+  transform: translateY(-55%);
   color: var(--text3);
   font-size: 0.75rem;
   pointer-events: none;
@@ -1234,7 +1234,7 @@ body.tinder-mode .toast-container {
   .search-box.active { display: block; }
   .search-input { width: 100%; background: var(--bg); padding-left: 36px; padding-right: 28px; }
   .search-input:focus { width: 100%; }
-  .search-icon { left: 16px; font-size: 0.85rem; }
+  .search-icon { left: 16px; top: 55%; transform: translateY(-55%); font-size: 0.85rem; }
   
   /* Remove padding adjustment - search is now floating overlay */
   .search-box.active ~ main,
