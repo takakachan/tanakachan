@@ -1039,6 +1039,14 @@ main {
 
 /* Mobile Responsive */
 @media (max-width: 768px) {
+  .toast-container {
+    bottom: 80px;
+    right: 10px;
+    left: 10px;
+  }
+  .toast-container > * {
+    width: 100%;
+  }
   header { padding: 0 12px; height: 52px; }
   .logo { font-size: 0.95rem; }
   
@@ -1095,8 +1103,13 @@ main {
   .action-btn { width: 32px; height: 32px; font-size: 0.9rem; }
   .action-btn svg { width: 16px; height: 16px; }
   
-  .tinder-stack { height: 55vh; max-width: 100%; }
-  .tinder-img { height: 40vh; }
+  .tinder-stack { height: 50vh; max-width: 100%; }
+  .tinder-img { height: 35vh; }
+  .tinder-content { padding: 8px; }
+  .tinder-title { font-size: 0.9rem; }
+  .tinder-btn { width: 48px; height: 48px; font-size: 1rem; }
+  .tinder-btn svg { width: 18px; height: 18px; }
+  .tinder-controls { gap: 8px; margin-top: 6px; }
   .tinder-content { padding: 12px; }
   .tinder-title { font-size: 1rem; }
   .tinder-btn { width: 56px; height: 56px; font-size: 1.2rem; }
