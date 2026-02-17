@@ -82,7 +82,7 @@ header {
 .nav-btn.active::after {
   content: '';
   position: absolute;
-  bottom: -1px;
+  bottom: 0;
   left: 0;
   right: 0;
   height: 2px;
@@ -162,9 +162,14 @@ header {
   top: 50%;
   transform: translateY(-50%);
   color: var(--text3);
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   pointer-events: none;
   z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
 }
 
 .search-clear {
@@ -890,27 +895,11 @@ body.tinder-mode .toast-container {
   transition: none;
 }
 
+/* Tinder like button - no animation on press, just color change */
 .tinder-btn.like.pressed {
   background: var(--accent);
   border-color: var(--accent);
   color: white;
-  transition: none;
-}
-
-/* Tinder like button heart color animation */
-@keyframes heartBeat {
-  0% { transform: scale(1); }
-  15% { transform: scale(1.3); }
-  30% { transform: scale(1); }
-  45% { transform: scale(1.2); }
-  60% { transform: scale(1); }
-}
-
-.tinder-btn.like.pressed {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: white;
-  animation: heartBeat 0.4s ease-in-out;
 }
 
 .tinder-btn.like.pressed svg {
@@ -1120,7 +1109,7 @@ body.tinder-mode .toast-container {
 .confirm {
   position: fixed;
   inset: 0;
-  background: rgba(255,255,255,0.95);
+  background: rgba(0,0,0,0.8);
   display: flex;
   align-items: center;
   justify-content: center;

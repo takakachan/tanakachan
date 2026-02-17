@@ -413,8 +413,12 @@ function setCardSize(size) {
   }
   const root = document.documentElement;
   const gridView = document.getElementById('grid-view');
+  const likesCards = document.getElementById('likes-cards');
   
   gridView.classList.remove('card-size-s', 'card-size-m', 'card-size-l', 'card-size-auto');
+  if (likesCards) {
+    likesCards.classList.remove('card-size-s', 'card-size-m', 'card-size-l', 'card-size-auto');
+  }
   
   let cardWidth;
   const isMobile = window.innerWidth <= 768;
@@ -422,18 +426,22 @@ function setCardSize(size) {
   if (isMobile) {
     if (size === 'small') {
       gridView.classList.add('card-size-s');
+      if (likesCards) likesCards.classList.add('card-size-s');
       cardWidth = 180;
     } else if (size === 'medium') {
       gridView.classList.add('card-size-m');
+      if (likesCards) likesCards.classList.add('card-size-m');
       cardWidth = 280;
     } else if (size === 'large') {
       gridView.classList.add('card-size-l');
+      if (likesCards) likesCards.classList.add('card-size-l');
       cardWidth = 400;
     }
     root.style.setProperty('--card-size', cardWidth + 'px');
     root.style.setProperty('--column-count', size === 'small' ? 2 : size === 'medium' ? 2 : 1);
   } else {
     gridView.classList.add('card-size-auto');
+    if (likesCards) likesCards.classList.add('card-size-auto');
     cardWidth = size === 'small' ? 180 : size === 'medium' ? 280 : 400;
     root.style.setProperty('--card-size', cardWidth + 'px');
     
@@ -964,7 +972,7 @@ function handleSwipe(direction) {
     card.querySelector('.tinder-stamp.like').classList.remove('show');
     card.querySelector('.tinder-stamp.nope').classList.remove('show');
     updateTinderCard();
-  }, 300);
+  }, 500);
 }
 
 function tinderLike() {
