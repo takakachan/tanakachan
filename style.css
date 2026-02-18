@@ -8,10 +8,19 @@
   --text3: #666666;
   --accent: #f8727c;
   --accent2: #fb98a8;
+  --accent-dim: rgba(248, 114, 124, 0.1);
+  --accent-dim2: rgba(248, 114, 124, 0.15);
   --border: #333333;
   --card-radius: 8px;
   --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   --card-size: 280px;
+  --bg-header: rgba(15, 15, 15, 0.98);
+  --overlay-modal: rgba(0, 0, 0, 0.9);
+  --overlay-confirm: rgba(0, 0, 0, 0.8);
+  --overlay-dark: rgba(0, 0, 0, 0.5);
+  --overlay-card: rgba(0, 0, 0, 0.4);
+  --shadow-dark: rgba(0, 0, 0, 0.3);
+  --shadow-light: rgba(0, 0, 0, 0.1);
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -36,7 +45,7 @@ header {
   right: 0;
   height: 56px;
   height: calc(56px + env(safe-area-inset-top));
-  background: rgba(15, 15, 15, 0.98);
+  background: var(--bg-header);
   backdrop-filter: blur(10px);
   display: flex;
   align-items: center;
@@ -166,8 +175,8 @@ header {
 .search-icon {
   position: absolute;
   left: 10px;
-  top: 52%;
-  transform: translateY(-52%);
+  top: 50%;
+  transform: translateY(-50%);
   color: var(--text3);
   font-size: 0.75rem;
   pointer-events: none;
@@ -343,7 +352,6 @@ main {
 
 /* Masonry Grid */
 .masonry {
-  column-count: var(--column-count, 3);
   column-width: var(--card-size);
   column-gap: 0;
 }
@@ -469,7 +477,7 @@ main {
   width: 22px;
   height: 22px;
   border: 2px solid var(--text2);
-  background: rgba(0,0,0,0.5);
+  background: var(--overlay-dark);
   border-radius: 4px;
   cursor: pointer;
   z-index: 10;
@@ -543,7 +551,7 @@ main {
   z-index: 150;
   opacity: 0;
   transition: var(--transition);
-  box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+  box-shadow: 0 10px 40px var(--shadow-dark);
 }
 
 .batch-bar.visible {
@@ -739,10 +747,10 @@ body.tinder-mode {
 
 /* Mobile nav should always be visible in tinder mode */
 body.tinder-mode .mobile-nav {
-  transform: translateY(0) !important;
-  display: flex !important;
-  opacity: 1 !important;
-  visibility: visible !important;
+  transform: translateY(0);
+  display: flex;
+  opacity: 1;
+  visibility: visible;
 }
 
 /* Tinder progress bar */
@@ -799,7 +807,7 @@ body.tinder-mode .toast-container {
   background: var(--bg);
   border: 1px solid var(--border);
   overflow: hidden;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+  box-shadow: 0 10px 40px var(--shadow-light);
   transition: transform 0.1s;
   cursor: grab;
 }
@@ -1007,7 +1015,7 @@ body.tinder-mode .toast-container {
 .modal {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.9);
+  background: var(--overlay-modal);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1139,7 +1147,7 @@ body.tinder-mode .toast-container {
 .confirm {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.8);
+  background: var(--overlay-confirm);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1228,7 +1236,7 @@ body.tinder-mode .toast-container {
     padding: 12px 16px;
     border: 1px solid var(--border);
     border-radius: 12px;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    box-shadow: 0 8px 32px var(--overlay-card);
     display: none;
     z-index: 200;
     margin-top: 8px;
@@ -1237,7 +1245,7 @@ body.tinder-mode .toast-container {
   .search-box.active { display: block; }
   .search-input { width: 100%; background: var(--bg); padding-left: 36px; padding-right: 28px; }
   .search-input:focus { width: 100%; }
-  .search-icon { left: 14px; top: 52%; transform: translateY(-52%); font-size: 0.85rem; display: flex; align-items: center; }
+  .search-icon { left: 14px; top: 50%; transform: translateY(-50%); font-size: 0.85rem; display: flex; align-items: center; }
   
   /* Remove padding adjustment - search is now floating overlay */
   .search-box.active ~ main,
@@ -1329,57 +1337,55 @@ body.tinder-mode .toast-container {
   .mobile-nav {
     display: flex;
     position: fixed;
-    bottom: 0 !important;
+    bottom: 0;
     left: 0;
     right: 0;
-    height: 50px !important;
-    background: var(--bg) !important;
+    height: 50px;
+    background: var(--bg);
     border-top: 1px solid var(--border);
     justify-content: space-around;
     align-items: center;
-    z-index: 99999 !important;
+    z-index: 99999;
     /* iOS Chrome-style smooth transition */
-    transform: translateY(0) !important;
-    opacity: 1 !important;
-    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease !important;
-    -webkit-transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease !important;
+    transform: translateY(0);
+    opacity: 1;
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease;
     -webkit-transform: translateY(0);
     border-radius: 0;
-    pointer-events: auto !important;
+    pointer-events: auto;
     /* Improve performance */
     will-change: transform, opacity;
   }
-  
+
   /* Hidden state - slide down and fade */
   .mobile-nav.hidden {
-    transform: translateY(100%) !important;
-    opacity: 0 !important;
-    pointer-events: none !important;
+    transform: translateY(100%);
+    opacity: 0;
+    pointer-events: none;
   }
 
   /* Toast container transition for smooth movement */
   .toast-container {
-    transition: bottom 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    transition: bottom 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   /* Toast container hidden state - sync with mobile-nav */
   .toast-container.hidden {
     /* Move to bottom of screen when nav is hidden */
-    bottom: 10px !important;
-    opacity: 1 !important;
-    pointer-events: auto !important;
+    bottom: 10px;
+    opacity: 1;
+    pointer-events: auto;
   }
 
   /* Header scroll hide - iOS Chrome-style smooth transition */
   header.scroll-hidden {
-    transform: translateY(calc(-100% - env(safe-area-inset-top))) !important;
-    opacity: 0 !important;
-    pointer-events: none !important;
+    transform: translateY(calc(-100% - env(safe-area-inset-top)));
+    opacity: 0;
+    pointer-events: none;
   }
-  
+
   header {
-    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease !important;
-    -webkit-transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease !important;
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease;
     will-change: transform, opacity;
   }
   
@@ -1412,7 +1418,7 @@ body.tinder-mode .toast-container {
   }
   
   .mobile-nav-btn:active {
-    background: rgba(248, 114, 124, 0.15);
+    background: var(--accent-dim2);
   }
   
   .mobile-nav-btn:active .mobile-nav-icon,
@@ -1426,7 +1432,7 @@ body.tinder-mode .toast-container {
   
   .mobile-nav-btn.active {
     color: var(--accent);
-    background: rgba(248, 114, 124, 0.1);
+    background: var(--accent-dim);
   }
   
   .mobile-nav-btn.active .mobile-nav-icon {

@@ -1,3 +1,26 @@
+function debounce(fn, delay) {
+  let timer;
+  return function(...args) {
+    clearTimeout(timer);
+    timer = setTimeout(() => fn.apply(this, args), delay);
+  };
+}
+
+// Debounced render helpers — coalesce rapid state changes into a single re-render
+// to prevent infinite loop risk when multiple state mutations occur in the same tick.
+const debouncedRender = debounce(() => render(), 16);
+const debouncedRenderLikes = debounce(() => renderLikes(), 16);
+const debouncedRenderNope = debounce(() => renderNope(), 16);
+
+function escHtml(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 // State Management
 let state = {
   items: [],
@@ -65,7 +88,7 @@ function cleanupOldNopeItems() {
   
   Object.keys(state.nopeTimestamps).forEach(id => {
     if (now - state.nopeTimestamps[id] > twentyFourHours) {
-      const item = state.items.find(i => i.id == id);
+      const item = state.items.find(i => i.id === Number(id));
       if (item && item.nope) {
         item.nope = false;
         cleanedCount++;
@@ -152,40 +175,63 @@ function renderRssFeedsList() {
         <div style="font-size:0.75rem;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${feed.genre}</div>
         <div style="font-size:0.65rem;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${feed.url}</div>
       </div>
-      <button onclick="removeRssFeed(${feed.id})" style="background:none;border:none;color:var(--text3);cursor:pointer;padding:4px 8px;fontrem;">×-size:1</button>
+      <button data-action="remove-rss-feed" data-id="${feed.id}" style="background:none;border:none;color:var(--text3);cursor:pointer;padding:4px 8px;font-size:1rem;">×</button>
     </div>
   `).join('');
 }
 
 // Fetch RSS feed using a CORS proxy
-async function fetchRssFeed(feed) {
+async function fetchRssFeed(feed, { timeout = 10000, retries = 2 } = {}) {
   // Using rss2json API as a proxy to avoid CORS issues
   const proxyUrl = 'https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(feed.url);
-  
-  try {
-    const response = await fetch(proxyUrl);
-    const data = await response.json();
-    
-    if (data.status !== 'ok' || !data.items) {
-      console.error('Error fetching RSS:', data);
-      return [];
+
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeout);
+
+    try {
+      const response = await fetch(proxyUrl, { signal: controller.signal });
+      clearTimeout(timer);
+
+      if (!response.ok) {
+        console.error('Error fetching RSS: HTTP ' + response.status);
+        return [];
+      }
+      const data = await response.json();
+
+      if (data.status !== 'ok' || !data.items) {
+        console.error('Error fetching RSS:', data);
+        return [];
+      }
+
+      return data.items.map((item, index) => ({
+        id: feed.id + '_' + index,
+        type: feed.genre.toLowerCase(),
+        title: item.title,
+        source: feed.genre,
+        thumbnail: item.thumbnail || item.enclosure?.link || '',
+        date: item.pubDate ? item.pubDate.split(' ')[0] : new Date().toISOString().split('T')[0],
+        url: item.link,
+        liked: false,
+        nope: false
+      }));
+    } catch (error) {
+      clearTimeout(timer);
+      const isTimeout = error.name === 'AbortError';
+      const isLastAttempt = attempt === retries;
+
+      if (isLastAttempt) {
+        console.error('Error fetching RSS feed (gave up after ' + (retries + 1) + ' attempts):', feed.url, error);
+        return [];
+      }
+
+      const delay = 1000 * (attempt + 1);
+      console.warn((isTimeout ? 'Timeout' : 'Error') + ' fetching RSS feed, retrying in ' + delay + 'ms... (' + (attempt + 1) + '/' + retries + '):', feed.url);
+      await new Promise(resolve => setTimeout(resolve, delay));
     }
-    
-    return data.items.map((item, index) => ({
-      id: feed.id + '_' + index,
-      type: feed.genre.toLowerCase(),
-      title: item.title,
-      source: feed.genre,
-      thumbnail: item.thumbnail || item.enclosure?.link || '',
-      date: item.pubDate ? item.pubDate.split(' ')[0] : new Date().toISOString().split('T')[0],
-      url: item.link,
-      liked: false,
-      nope: false
-    }));
-  } catch (error) {
-    console.error('Error fetching RSS feed:', feed.url, error);
-    return [];
   }
+
+  return [];
 }
 
 // Fetch all RSS feeds
@@ -194,21 +240,26 @@ async function fetchAllRss() {
     showToast('No RSS feeds registered');
     return;
   }
-  
+
   showToast('Fetching RSS feeds...');
-  
-  const allItems = [];
-  for (const feed of state.rssFeeds) {
-    const items = await fetchRssFeed(feed);
-    allItems.push(...items);
-  }
-  
-  if (allItems.length > 0) {
-    state.items = allItems;
-    render();
-    showToast('Loaded ' + allItems.length + ' items from RSS feeds');
-  } else {
-    showToast('No items found from RSS feeds');
+
+  try {
+    const allItems = [];
+    for (const feed of state.rssFeeds) {
+      const items = await fetchRssFeed(feed);
+      allItems.push(...items);
+    }
+
+    if (allItems.length > 0) {
+      state.items = allItems;
+      render();
+      showToast('Loaded ' + allItems.length + ' items from RSS feeds');
+    } else {
+      showToast('No items found from RSS feeds');
+    }
+  } catch (e) {
+    console.error('Error fetching RSS feeds:', e);
+    showToast('Failed to fetch RSS feeds');
   }
 }
 
@@ -281,9 +332,9 @@ function init() {
   setupTinderSwipe();
   setCardSize(state.cardSize);
   
-  window.addEventListener('resize', () => {
+  window.addEventListener('resize', debounce(() => {
     setCardSize(state.cardSize);
-  });
+  }, 150));
 }
 
 // Load Demo Data
@@ -298,9 +349,9 @@ function loadDemoData() {
 
 // Setup Events
 function setupEvents() {
-  document.querySelectorAll('.filter-btn').forEach(b => {
+  document.querySelectorAll('.filter-btn')?.forEach(b => {
     b.addEventListener('click', () => {
-      document.querySelectorAll('.filter-btn').forEach(x => x.classList.remove('active'));
+      document.querySelectorAll('.filter-btn')?.forEach(x => x.classList.remove('active'));
       b.classList.add('active');
       state.filter = b.dataset.filter;
       state.searchQuery = '';
@@ -308,6 +359,70 @@ function setupEvents() {
       if (state.currentMode === 'tinder') initTinder();
       render();
     });
+  });
+
+  // Event delegation for RSS feeds list
+  document.getElementById('rss-feeds-list').addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-action="remove-rss-feed"]');
+    if (btn) removeRssFeed(Number(btn.dataset.id));
+  });
+
+  // Event delegation for main cards grid
+  document.getElementById('cards').addEventListener('click', (e) => {
+    const toggleSelect = e.target.closest('[data-action="toggle-select"]');
+    if (toggleSelect) {
+      e.stopPropagation();
+      toggleItemSelection(Number(toggleSelect.dataset.id));
+      return;
+    }
+    const toggleLikeBtn = e.target.closest('[data-action="toggle-like"]');
+    if (toggleLikeBtn) {
+      e.stopPropagation();
+      toggleLike(Number(toggleLikeBtn.dataset.id));
+      return;
+    }
+    const toggleNopeBtn = e.target.closest('[data-action="toggle-nope"]');
+    if (toggleNopeBtn) {
+      e.stopPropagation();
+      toggleNope(Number(toggleNopeBtn.dataset.id));
+      return;
+    }
+    const card = e.target.closest('[data-action="card-click"]');
+    if (card) handleCardClick(e, Number(card.dataset.id));
+  });
+
+  // Event delegation for likes cards
+  document.getElementById('likes-cards').addEventListener('click', (e) => {
+    const removeLikeBtn = e.target.closest('[data-action="remove-like"]');
+    if (removeLikeBtn) {
+      e.stopPropagation();
+      removeLike(Number(removeLikeBtn.dataset.id), 'like');
+      return;
+    }
+    const card = e.target.closest('[data-action="open-url"]');
+    if (card) window.open(card.dataset.url, '_blank');
+  });
+
+  // Event delegation for nope cards
+  document.getElementById('nope-cards').addEventListener('click', (e) => {
+    const toggleNopeBtn = e.target.closest('[data-action="toggle-nope"]');
+    if (toggleNopeBtn) {
+      e.stopPropagation();
+      toggleNope(Number(toggleNopeBtn.dataset.id));
+      return;
+    }
+    const card = e.target.closest('[data-action="open-url"]');
+    if (card) window.open(card.dataset.url, '_blank');
+  });
+
+  // Event delegation for tinder completion screen buttons
+  document.getElementById('tinder-card').addEventListener('click', (e) => {
+    if (e.target.closest('[data-action="tinder-restart"]')) {
+      loadDemoData();
+      initTinder();
+    } else if (e.target.closest('[data-action="set-mode-grid"]')) {
+      setMode('grid');
+    }
   });
 }
 
@@ -345,25 +460,25 @@ function clearSearch() {
   input.value = '';
   state.searchQuery = '';
   document.querySelector('.search-clear')?.classList.remove('visible');
-  render();
+  debouncedRender();
   // Also clear search in likes and nope views
   if (state.currentMode === 'likes') {
-    renderLikes();
+    debouncedRenderLikes();
   }
   if (state.currentMode === 'nope') {
-    renderNope();
+    debouncedRenderNope();
   }
 }
 
 function handleSearch(query) {
   state.searchQuery = query.toLowerCase().trim();
-  render();
+  debouncedRender();
   // Also update likes and nope views when search is active
   if (state.currentMode === 'likes') {
-    renderLikes();
+    debouncedRenderLikes();
   }
   if (state.currentMode === 'nope') {
-    renderNope();
+    debouncedRenderNope();
   }
 }
 
@@ -383,8 +498,8 @@ function setMode(m) {
   state.currentMode = m;
   // Toggle tinder-mode class on body for scroll prevention
   document.body.classList.toggle('tinder-mode', m === 'tinder');
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.mode === m));
-  document.querySelectorAll('.mobile-nav-btn').forEach(b => b.classList.toggle('active', b.dataset.mode === m));
+  document.querySelectorAll('.nav-btn')?.forEach(b => b.classList.toggle('active', b.dataset.mode === m));
+  document.querySelectorAll('.mobile-nav-btn')?.forEach(b => b.classList.toggle('active', b.dataset.mode === m));
   document.getElementById('grid-view').style.display = m === 'grid' ? 'block' : 'none';
   document.getElementById('tinder-view').classList.toggle('active', m === 'tinder');
   document.getElementById('likes-view').classList.toggle('active', m === 'likes');
@@ -453,9 +568,9 @@ function setCardSize(size) {
     }
   }
 
-  document.querySelectorAll('.size-selector').forEach(selector => {
-    selector.querySelectorAll('.size-btn').forEach(btn => btn.classList.remove('active'));
-    selector.querySelector(`.size-btn[onclick="setCardSize('${size}')"]`)?.classList.add('active');
+  document.querySelectorAll('.size-selector')?.forEach(selector => {
+    selector.querySelectorAll('.size-btn')?.forEach(btn => btn.classList.remove('active'));
+    selector.querySelector(`.size-btn[data-size="${size}"]`)?.classList.add('active');
   });
 }
 
@@ -584,7 +699,7 @@ function cancelSelection() {
 // Likes Functions
 function setLikesFilter(filter) {
   state.likesFilter = filter;
-  document.querySelectorAll('.view-toggle-btn').forEach(btn => btn.classList.remove('active'));
+  document.querySelectorAll('.view-toggle-btn')?.forEach(btn => btn.classList.remove('active'));
   document.querySelector(`.view-toggle-btn[data-filter="${filter}"]`)?.classList.add('active');
   renderLikes();
 }
@@ -650,8 +765,8 @@ function render() {
   }
 
   document.getElementById('cards').innerHTML = items.map((x, i) => `
-    <div class="card ${state.selectedItems.has(x.id) ? 'selected' : ''}" data-id="${x.id}" onclick="handleCardClick(event, ${x.id})" style="animation-delay: ${i * 0.02}s">
-      <div class="card-checkbox ${state.selectedItems.has(x.id) ? 'checked' : ''}" onclick="event.stopPropagation();toggleItemSelection(${x.id})"></div>
+    <div class="card ${state.selectedItems.has(x.id) ? 'selected' : ''}" data-id="${x.id}" data-action="card-click" style="animation-delay: ${i * 0.02}s">
+      <div class="card-checkbox ${state.selectedItems.has(x.id) ? 'checked' : ''}" data-action="toggle-select" data-id="${x.id}"></div>
       <div class="card-img-wrap">
         ${x.thumbnail ? `<img class="card-img" src="${x.thumbnail}" alt="">` : `<div class="card-img empty">${typeIcons[x.type] || '📄'}</div>`}
       </div>
@@ -661,12 +776,12 @@ function render() {
         <div class="card-meta">
           <span class="card-source">${x.source}</span>
           <div class="card-actions-mini">
-            ${x.liked 
-              ? `<button class="card-btn-mini liked" onclick="event.stopPropagation();toggleLike(${x.id})">${icons.heart}</button>` 
-              : `<button class="card-btn-mini like-btn" onclick="event.stopPropagation();toggleLike(${x.id})">${icons.heartOutline}</button>`}
-            ${x.nope 
-              ? `<button class="card-btn-mini nope" onclick="event.stopPropagation();toggleNope(${x.id})">${icons.nope}</button>` 
-              : `<button class="card-btn-mini nope-btn" onclick="event.stopPropagation();toggleNope(${x.id})">${icons.nope}</button>`}
+            ${x.liked
+              ? `<button class="card-btn-mini liked" data-action="toggle-like" data-id="${x.id}">${icons.heart}</button>`
+              : `<button class="card-btn-mini like-btn" data-action="toggle-like" data-id="${x.id}">${icons.heartOutline}</button>`}
+            ${x.nope
+              ? `<button class="card-btn-mini nope" data-action="toggle-nope" data-id="${x.id}">${icons.nope}</button>`
+              : `<button class="card-btn-mini nope-btn" data-action="toggle-nope" data-id="${x.id}">${icons.nope}</button>`}
           </div>
         </div>
       </div>
@@ -721,7 +836,7 @@ function renderLikes() {
   }
 
   document.getElementById('likes-cards').innerHTML = items.map((x, i) => `
-    <div class="card" onclick="window.open('${x.url}', '_blank')" style="animation-delay: ${i * 0.02}s">
+    <div class="card" data-action="open-url" data-url="${escHtml(x.url)}" style="animation-delay: ${i * 0.02}s">
       <div class="card-img-wrap">
         ${x.thumbnail ? `<img class="card-img" src="${x.thumbnail}" alt="">` : `<div class="card-img empty">📄</div>`}
       </div>
@@ -730,7 +845,7 @@ function renderLikes() {
         <div class="card-title">${x.title}</div>
         <div class="card-meta">
           <span class="card-source">${x.source}</span>
-          <button class="card-btn-mini" onclick="event.stopPropagation();removeLike(${x.id}, 'like')">
+          <button class="card-btn-mini" data-action="remove-like" data-id="${x.id}">
             ${icons.trash}
           </button>
         </div>
@@ -773,12 +888,12 @@ function renderNope() {
   }
   
   document.getElementById('nope-cards').innerHTML = items.map((x, i) => `
-    <div class="card" onclick="window.open('${x.url}', '_blank')" style="animation-delay: ${i * 0.02}s">
+    <div class="card" data-action="open-url" data-url="${escHtml(x.url)}" style="animation-delay: ${i * 0.02}s">
       <div class="card-body" style="padding: 10px 12px;">
         <div class="card-title" style="margin-bottom: 4px;">${x.title}</div>
         <div class="card-meta">
           <span class="card-source">${x.source}</span>
-          <button class="card-btn-mini" onclick="event.stopPropagation();toggleNope(${x.id})">
+          <button class="card-btn-mini" data-action="toggle-nope" data-id="${x.id}">
             ${icons.undo}
           </button>
         </div>
@@ -868,7 +983,6 @@ function updateTinderCard() {
   sn.classList.remove('show');
 
   if (state.tinderIndex >= items.length) {
-    const card = document.getElementById('tinder-card');
     const img = document.getElementById('tinder-img');
     img.src = '';
     img.classList.add('empty');
@@ -893,10 +1007,10 @@ function updateTinderCard() {
         <div style="font-size:1rem;font-weight:500;color:#f8727c;margin-bottom:16px;">Amazing Work! ✨</div>
         <div style="font-size:0.9rem;color:rgba(255,255,255,0.7);margin-bottom:28px;max-width:260px;line-height:1.6;">${tinderEmptyHint}</div>
         <div style="display:flex;gap:14px;flex-wrap:wrap;justify-content:center;">
-          <button onclick="loadDemoData();initTinder();" style="padding:14px 28px;background:linear-gradient(135deg, #f8727c 0%, #fb98a8 100%);color:white;border:none;border-radius:30px;font-size:0.9rem;font-weight:600;cursor:pointer;transition:all 0.2s;box-shadow:0 4px 15px rgba(248, 114, 124, 0.4);">
+          <button data-action="tinder-restart" style="padding:14px 28px;background:linear-gradient(135deg, #f8727c 0%, #fb98a8 100%);color:white;border:none;border-radius:30px;font-size:0.9rem;font-weight:600;cursor:pointer;transition:all 0.2s;box-shadow:0 4px 15px rgba(248, 114, 124, 0.4);">
             🔄 もう一度
           </button>
-          <button onclick="setMode('grid')" style="padding:14px 28px;background:rgba(255,255,255,0.1);color:#fff;border:1px solid rgba(255,255,255,0.2);border-radius:30px;font-size:0.9rem;cursor:pointer;transition:background 0.2s;">
+          <button data-action="set-mode-grid" style="padding:14px 28px;background:rgba(255,255,255,0.1);color:#fff;border:1px solid rgba(255,255,255,0.2);border-radius:30px;font-size:0.9rem;cursor:pointer;transition:background 0.2s;">
             📋 すべて見る
           </button>
         </div>
@@ -976,8 +1090,10 @@ function handleSwipe(direction) {
       card.style.transition = 'none';
       card.style.transform = '';
       card.style.opacity = '';
-      card.querySelector('.tinder-stamp.like').classList.remove('show');
-      card.querySelector('.tinder-stamp.nope').classList.remove('show');
+      const likeStamp = card.querySelector('.tinder-stamp.like');
+      const nopeStamp = card.querySelector('.tinder-stamp.nope');
+      if (likeStamp) likeStamp.classList.remove('show');
+      if (nopeStamp) nopeStamp.classList.remove('show');
       updateTinderCard();
     }, 400);
   }, 300);
@@ -1036,7 +1152,6 @@ function toggleLike(id) {
 function toggleNope(id) {
   const x = state.items.find(i => i.id === id);
   if (x) {
-    const wasNoping = x.nope;
     x.nope = !x.nope;
     if (x.nope) {
       x.liked = false;
@@ -1082,7 +1197,7 @@ function showToast(msg) {
 
 // Refresh with button color animation
 function refreshAll() {
-  const btn = document.querySelector('.action-btn[onclick="refreshAll()"]');
+  const btn = document.querySelector('.action-btn[data-action="refresh-all"]');
   if (btn) {
     const originalColor = btn.style.color;
     btn.style.color = 'var(--accent)';
@@ -1121,30 +1236,40 @@ function updateDemoSource() {
 }
 
 // Tinder Swipe Setup
+let _tinderSwipeCleanup = null;
+
 function setupTinderSwipe() {
+  // Remove any previously attached listeners before adding new ones
+  if (_tinderSwipeCleanup) {
+    _tinderSwipeCleanup();
+    _tinderSwipeCleanup = null;
+  }
+
   const tc = document.getElementById('tinder-card');
   let isDragging = false, startX = 0, currentX = 0;
 
-  tc.addEventListener('mousedown', e => {
+  function onMouseDown(e) {
     if (state.tinderIndex >= getFilteredItems().length) return;
     isDragging = true;
     startX = e.clientX;
     tc.style.transition = 'none';
-  });
+  }
 
-  document.addEventListener('mousemove', e => {
+  function onMouseMove(e) {
     if (!isDragging) return;
     currentX = e.clientX - startX;
     const rot = currentX * 0.08;
     tc.style.transform = `translateX(${currentX}px) rotate(${rot}deg)`;
     const sl = tc.querySelector('.tinder-stamp.like');
     const sn = tc.querySelector('.tinder-stamp.nope');
-    if (currentX > 30) { sl.classList.add('show'); sn.classList.remove('show'); }
-    else if (currentX < -30) { sn.classList.add('show'); sl.classList.remove('show'); }
-    else { sl.classList.remove('show'); sn.classList.remove('show'); }
-  });
+    if (sl && sn) {
+      if (currentX > 30) { sl.classList.add('show'); sn.classList.remove('show'); }
+      else if (currentX < -30) { sn.classList.add('show'); sl.classList.remove('show'); }
+      else { sl.classList.remove('show'); sn.classList.remove('show'); }
+    }
+  }
 
-  document.addEventListener('mouseup', e => {
+  function onMouseUp() {
     if (!isDragging) return;
     isDragging = false;
     if (currentX > 80) tinderLike();
@@ -1152,21 +1277,22 @@ function setupTinderSwipe() {
     else {
       tc.style.transition = 'transform 0.2s';
       tc.style.transform = '';
-      tc.querySelector('.tinder-stamp.like').classList.remove('show');
-      tc.querySelector('.tinder-stamp.nope').classList.remove('show');
+      const slUp = tc.querySelector('.tinder-stamp.like');
+      const snUp = tc.querySelector('.tinder-stamp.nope');
+      if (slUp) slUp.classList.remove('show');
+      if (snUp) snUp.classList.remove('show');
     }
     currentX = 0;
-  });
+  }
 
-  // Touch events
-  tc.addEventListener('touchstart', e => {
+  function onTouchStart(e) {
     if (state.tinderIndex >= getFilteredItems().length) return;
     isDragging = true;
     startX = e.touches[0].clientX;
     tc.style.transition = 'none';
-  });
+  }
 
-  tc.addEventListener('touchmove', e => {
+  function onTouchMove(e) {
     if (!isDragging) return;
     e.preventDefault();
     currentX = e.touches[0].clientX - startX;
@@ -1174,12 +1300,14 @@ function setupTinderSwipe() {
     tc.style.transform = `translateX(${currentX}px) rotate(${rot}deg)`;
     const sl = tc.querySelector('.tinder-stamp.like');
     const sn = tc.querySelector('.tinder-stamp.nope');
-    if (currentX > 30) { sl.classList.add('show'); sn.classList.remove('show'); }
-    else if (currentX < -30) { sn.classList.add('show'); sl.classList.remove('show'); }
-    else { sl.classList.remove('show'); sn.classList.remove('show'); }
-  }, { passive: false });
+    if (sl && sn) {
+      if (currentX > 30) { sl.classList.add('show'); sn.classList.remove('show'); }
+      else if (currentX < -30) { sn.classList.add('show'); sl.classList.remove('show'); }
+      else { sl.classList.remove('show'); sn.classList.remove('show'); }
+    }
+  }
 
-  tc.addEventListener('touchend', e => {
+  function onTouchEnd() {
     if (!isDragging) return;
     isDragging = false;
     if (currentX > 80) tinderLike();
@@ -1187,11 +1315,29 @@ function setupTinderSwipe() {
     else {
       tc.style.transition = 'transform 0.2s';
       tc.style.transform = '';
-      tc.querySelector('.tinder-stamp.like').classList.remove('show');
-      tc.querySelector('.tinder-stamp.nope').classList.remove('show');
+      const slEnd = tc.querySelector('.tinder-stamp.like');
+      const snEnd = tc.querySelector('.tinder-stamp.nope');
+      if (slEnd) slEnd.classList.remove('show');
+      if (snEnd) snEnd.classList.remove('show');
     }
     currentX = 0;
-  });
+  }
+
+  tc.addEventListener('mousedown', onMouseDown);
+  document.addEventListener('mousemove', onMouseMove);
+  document.addEventListener('mouseup', onMouseUp);
+  tc.addEventListener('touchstart', onTouchStart);
+  tc.addEventListener('touchmove', onTouchMove, { passive: false });
+  tc.addEventListener('touchend', onTouchEnd);
+
+  _tinderSwipeCleanup = function() {
+    tc.removeEventListener('mousedown', onMouseDown);
+    document.removeEventListener('mousemove', onMouseMove);
+    document.removeEventListener('mouseup', onMouseUp);
+    tc.removeEventListener('touchstart', onTouchStart);
+    tc.removeEventListener('touchmove', onTouchMove);
+    tc.removeEventListener('touchend', onTouchEnd);
+  };
 }
 
 // iOS Chrome/PWA-style mobile nav & header: hide on scroll down, show on scroll up
