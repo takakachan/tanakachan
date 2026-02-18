@@ -958,32 +958,35 @@ function initTinder() {
 }
 
 function setupTinderButtonEvents() {
-  // Like button
+  // Like button - use event listeners for reliability
   const likeBtn = document.querySelector('.tinder-btn.like');
   if (likeBtn) {
-    likeBtn.onmousedown = () => likeBtn.classList.add('pressed');
+    likeBtn.onclick = tinderLike;
+    likeBtn.onmousedown = (e) => { e.preventDefault(); likeBtn.classList.add('pressed'); };
     likeBtn.onmouseup = () => likeBtn.classList.remove('pressed');
     likeBtn.onmouseleave = () => likeBtn.classList.remove('pressed');
     likeBtn.ontouchstart = (e) => { e.preventDefault(); likeBtn.classList.add('pressed'); };
-    likeBtn.ontouchend = () => likeBtn.classList.remove('pressed');
+    likeBtn.ontouchend = (e) => { e.preventDefault(); likeBtn.classList.remove('pressed'); };
   }
   // Nope button
   const nopeBtn = document.querySelector('.tinder-btn.nope');
   if (nopeBtn) {
-    nopeBtn.onmousedown = () => nopeBtn.classList.add('pressed');
+    nopeBtn.onclick = tinderNope;
+    nopeBtn.onmousedown = (e) => { e.preventDefault(); nopeBtn.classList.add('pressed'); };
     nopeBtn.onmouseup = () => nopeBtn.classList.remove('pressed');
     nopeBtn.onmouseleave = () => nopeBtn.classList.remove('pressed');
     nopeBtn.ontouchstart = (e) => { e.preventDefault(); nopeBtn.classList.add('pressed'); };
-    nopeBtn.ontouchend = () => nopeBtn.classList.remove('pressed');
+    nopeBtn.ontouchend = (e) => { e.preventDefault(); nopeBtn.classList.remove('pressed'); };
   }
   // Undo button
   const undoBtn = document.querySelector('.tinder-btn.undo');
   if (undoBtn) {
-    undoBtn.onmousedown = () => undoBtn.classList.add('pressed');
+    undoBtn.onclick = undoLast;
+    undoBtn.onmousedown = (e) => { e.preventDefault(); undoBtn.classList.add('pressed'); };
     undoBtn.onmouseup = () => undoBtn.classList.remove('pressed');
     undoBtn.onmouseleave = () => undoBtn.classList.remove('pressed');
     undoBtn.ontouchstart = (e) => { e.preventDefault(); undoBtn.classList.add('pressed'); };
-    undoBtn.ontouchend = () => undoBtn.classList.remove('pressed');
+    undoBtn.ontouchend = (e) => { e.preventDefault(); undoBtn.classList.remove('pressed'); };
   }
 }
 
@@ -1236,7 +1239,10 @@ function confirmDelete() {
       const x = state.items.find(i => i.id === deleteTarget);
       if (x) { 
         x.liked = false; 
-        showToast('Removed from Collected'); 
+        x.nope = true;
+        state.nopeTimestamps[x.id] = Date.now();
+        saveNopeTimestamps();
+        showToast('Moved to Nope'); 
       }
     }
     renderLikes();
