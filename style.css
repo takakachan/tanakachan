@@ -752,6 +752,8 @@ main {
 }
 
 .tinder-view.active { display: flex; }
+#grid-view { display: block; }
+#grid-view:not(.active) { display: none; }
 
 /* Tinder mode - prevent body scroll */
 body.tinder-mode {
@@ -835,6 +837,19 @@ body.tinder-mode .toast-container {
   height: 380px;
   object-fit: cover;
   background: var(--bg2);
+  transition: background 0.3s;
+}
+
+/* Loading shimmer for tinder image */
+.tinder-img[src=""] {
+  background: linear-gradient(90deg, var(--bg2) 25%, var(--bg3) 50%, var(--bg2) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
 }
 
 .tinder-img.empty {
@@ -1342,7 +1357,8 @@ body.tinder-mode .toast-container {
 }
 
 @media (max-width: 480px) { 
-  .masonry { columns: 1; } 
+  .masonry:not(.card-size-s):not([id="likes-cards"].card-size-s):not([id="nope-cards"].card-size-s) { columns: 1; }
+  .card-size-s .masonry { columns: 2 140px; }
 }
 
 /* Mobile Navigation */
