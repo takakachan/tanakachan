@@ -845,7 +845,7 @@ function renderLikes() {
         <div class="card-title">${x.title}</div>
         <div class="card-meta">
           <span class="card-source">${x.source}</span>
-          <button class="card-btn-mini" data-action="remove-like" data-id="${x.id}">
+          <button class="card-btn-mini" data-action="remove-like" data-id="${x.id}" title="Remove" aria-label="Remove from collected">
             ${icons.trash}
           </button>
         </div>
