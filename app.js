@@ -1448,5 +1448,9 @@ function setupTinderSwipe() {
   }, { passive: true });
 })();
 
-// Start
-init();
+// Start - wait for DOM to be ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
